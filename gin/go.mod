@@ -1,4 +1,4 @@
-module mark
+module gin
 
 require (
 	github.com/gin-contrib/sse v0.0.0-20170109093832-22d885f9ecc7 // indirect
