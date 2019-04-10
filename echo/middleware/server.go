@@ -60,6 +60,24 @@ func ServerHeader(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+// SetCookie middleware adds a cookie to the response.
+func SetCookie(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		cookie := new(http.Cookie)
+		cookie.Name = "username"
+		cookie.Value = "jon"
+		cookie.Expires = time.Now().Add(24 * time.Hour)
+		c.SetCookie(cookie)
+		fmt.Println("SetCookie middleware before next()")
+		if err := next(c); err != nil {
+			c.Error(err)
+		}
+		fmt.Println("SetCookie middleware after next()")
+		return nil
+	}
+
+}
+
 func main() {
 	e := echo.New()
 
@@ -72,7 +90,7 @@ func main() {
 	// Stats
 	s := NewStats()
 	e.Use(s.Process)
-	e.GET("/stats", s.Handle) // Endpoint to get stats
+	e.GET("/stats", s.Handle, SetCookie) // Endpoint to get stats
 
 	// Server header
 	e.Use(ServerHeader)
@@ -82,6 +100,10 @@ func main() {
 		fmt.Println("/ request")
 		return c.String(http.StatusOK, "Hello, World!")
 	})
+
+	// Group test
+	admin := e.Group("/admin", SetCookie)
+	admin.GET("/hello", s.Handle)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
