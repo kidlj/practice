@@ -11,6 +11,7 @@ import (
 )
 
 type (
+	// Stats is stats :)
 	Stats struct {
 		Uptime       time.Time      `json:"uptime"`
 		RequestCount uint64         `json:"requestCount"`
@@ -19,6 +20,7 @@ type (
 	}
 )
 
+// NewStats creates a stats
 func NewStats() *Stats {
 	return &Stats{
 		Uptime:   time.Now(),
