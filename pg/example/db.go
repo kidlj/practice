@@ -1,8 +1,6 @@
 package example
 
 import (
-	"fmt"
-
 	"github.com/go-pg/pg"
 )
 
@@ -14,5 +12,4 @@ func init() {
 		Password: "demo",
 		Database: "demo",
 	})
-	fmt.Println(DB)
 }
