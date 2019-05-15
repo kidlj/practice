@@ -1,4 +1,4 @@
-package examples
+package example_test
 
 import (
 	"fmt"
@@ -43,9 +43,6 @@ func (e Errno) Error() string {
 }
 
 // This example shows that interface value can be compared to a concrete value that implements it,
-// But I can't find this specification in Go spec doc.
-// https://golang.org/ref/spec#Comparison_operators
-// https://medium.com/learning-the-go-programming-language/comparing-values-in-go-8f7b002e767a
 func ExampleErrno_Error() {
 	e := Errno(1)
 	fmt.Println(e.Error())
