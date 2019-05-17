@@ -1,4 +1,4 @@
-package example_test
+package recursion
 
 import (
 	"fmt"
@@ -6,8 +6,7 @@ import (
 	"text/scanner"
 )
 
-// Clear is better than clever;
-// This is not clear.
+// The book implementation
 func IsBalancedRecursiveBook(s string) bool {
 	var (
 		scan       scanner.Scanner
@@ -78,40 +77,4 @@ func IsBalancedRecursive(s string) bool {
 	}
 
 	return true
-}
-
-func ExampleIsBalancedRecursive() {
-	a := []string{
-		"",
-		"[]",
-		"[][]",
-		"[[]]",
-		"[[]][]",
-		"[[[[][]]][]]",
-		"[",
-		"]",
-		"[[",
-		"][",
-		"]]",
-		"[]]",
-		"[a]",
-	}
-
-	for _, s := range a {
-		fmt.Println(IsBalancedRecursive(s))
-	}
-	// Output:
-	// true
-	// true
-	// true
-	// true
-	// true
-	// true
-	// false
-	// false
-	// false
-	// false
-	// false
-	// false
-	// false
 }
