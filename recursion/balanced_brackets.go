@@ -1,7 +1,6 @@
 package recursion
 
 import (
-	"fmt"
 	"strings"
 	"text/scanner"
 )
@@ -27,11 +26,9 @@ func IsBalancedRecursiveBook(s string) bool {
 			}
 		}
 		if ch != ']' {
-			fmt.Printf("catch: %s\n", string(ch))
 			return false
 		}
 		ch = scan.Next()
-		fmt.Printf("%s\n", string(ch))
 		if ch == '[' {
 			return isBalanced()
 		}
