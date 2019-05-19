@@ -7,7 +7,8 @@ import (
 
 func IsBalancedStack(s string) bool {
 	var scan scanner.Scanner
-	var stack ArrayStack
+	// var stack ArrayStack
+	var stack LinkedStack
 
 	scan.Init(strings.NewReader(s))
 
