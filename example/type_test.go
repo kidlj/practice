@@ -119,3 +119,11 @@ func ExampleArrayIndex() {
 	// Output:
 	// panic: index out of range
 }
+
+func ExampleMakeSlice() {
+	a := make([]int, 4)
+	a = append(a, 1)
+	fmt.Println(a)
+	// Output:
+	// [0 0 0 0 1]
+}
