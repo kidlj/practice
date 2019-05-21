@@ -2,6 +2,7 @@ package queue
 
 import "errors"
 
+// ArrayQueue is the array implementation
 type ArrayQueue struct {
 	count      int
 	frontIndex int
@@ -50,4 +51,62 @@ func (q *ArrayQueue) Front() (interface{}, error) {
 	}
 
 	return q.store[q.frontIndex], nil
+}
+
+// LinkedQueue is the linked implementation
+type LinkedQueue struct {
+	frontPtr *node
+	rearPtr  *node
+	count    int
+}
+
+type node struct {
+	item interface{}
+	next *node
+}
+
+func (q *LinkedQueue) IsEmpty() bool {
+	return q.count == 0
+}
+
+func (q *LinkedQueue) Size() int {
+	return q.count
+}
+
+func (q *LinkedQueue) Clear() {
+	q.frontPtr = nil
+	q.rearPtr = nil
+	q.count = 0
+}
+
+func (q *LinkedQueue) Enter(e interface{}) {
+	n := &node{e, nil}
+	if q.IsEmpty() {
+		q.frontPtr = n
+	} else {
+		q.rearPtr.next = n
+	}
+	q.rearPtr = n
+	q.count++
+}
+
+func (q *LinkedQueue) Leave() (interface{}, error) {
+	if q.IsEmpty() {
+		return nil, errors.New("queue is empty")
+	}
+	result := q.frontPtr.item
+	q.frontPtr = q.frontPtr.next
+	if q.frontPtr == nil {
+		q.rearPtr = nil
+	}
+	q.count--
+	return result, nil
+}
+
+func (q *LinkedQueue) Front() (interface{}, error) {
+	if q.IsEmpty() {
+		return nil, errors.New("queue is empty")
+	}
+
+	return q.frontPtr.item, nil
 }

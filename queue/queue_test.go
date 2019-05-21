@@ -6,7 +6,8 @@ import (
 )
 
 func ExampleQueue() {
-	var q ArrayQueue
+	// var q ArrayQueue
+	var q LinkedQueue
 	var a []interface{}
 	for i := 0; i < 10; i++ {
 		q.Enter(i)
@@ -35,6 +36,8 @@ func ExampleQueue() {
 	}
 
 	fmt.Println(a)
+	fmt.Println(q.IsEmpty())
 	// Output:
 	// [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19]
+	// true
 }
