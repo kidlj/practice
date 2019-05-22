@@ -18,7 +18,7 @@ type List interface {
 	Equal(l List) bool
 }
 
-// ArrayList is a contiguous implemention of a list.
+// ArrayList is a contiguous implementation of a list.
 type ArrayList struct {
 	store []interface{}
 	count int
