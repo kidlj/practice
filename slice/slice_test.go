@@ -106,3 +106,32 @@ func ExampleFilter() {
 	// Output:
 	// [hello world]
 }
+
+func ExampleCopy() {
+	a := []int{1, 2, 3}
+	b := []int{4, 5, 6, 7}
+	n := copy(a, b)
+	fmt.Println(a)
+	fmt.Println(n)
+	// Output:
+	// [4 5 6]
+	// 3
+}
+
+func ExampleIndex() {
+	a := []int{}
+	b := []int{0}
+	var c []int
+	fmt.Println(a == nil)
+	fmt.Println(c == nil)
+	fmt.Println(a[0:])
+	fmt.Println(b[1:])
+	fmt.Println(c[0:])
+	// fmt.Println(a[1:]) // panic: runtime error: slice bounds out of range
+	// Output:
+	// false
+	// true
+	// []
+	// []
+	// []
+}
