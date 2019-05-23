@@ -10,7 +10,7 @@ type Container interface {
 // Collection is the ancestor type of all traversible containers in the hierarchy.
 type Collection interface {
 	Container
-	Containes(e interface{}) bool
+	Contains(e interface{}) bool
 	NewIterator() Iterator
 	Apply(f func(interface{}))
 }
