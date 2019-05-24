@@ -42,9 +42,9 @@ func ExampleInts_IterChannel() {
 	// 3
 }
 
-func ExampleInts_IterDo() {
+func ExampleInts_Apply() {
 	ints := Ints{1, 2, 3}
-	ints.IterDo(func(val int) {
+	ints.Apply(func(val int) {
 		fmt.Println(val)
 	})
 	// Output:

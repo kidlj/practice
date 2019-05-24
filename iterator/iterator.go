@@ -50,8 +50,8 @@ func (i Ints) IterChannel() <-chan int {
 	return ch
 }
 
-// Do
-func (i Ints) IterDo(fn func(int)) {
+// Apply
+func (i Ints) Apply(fn func(int)) {
 	for _, val := range i {
 		fn(val)
 	}
