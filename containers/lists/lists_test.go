@@ -91,7 +91,7 @@ func testList(t *testing.T, list List, name string) {
 	}
 
 	// try internal iterators
-	var expectedValue int = 0
+	expectedValue := 0
 	var evf = func(e interface{}) {
 		if expectedValue != e {
 			t.Errorf("Expected %v but got %v during internal iteration", expectedValue, e)
