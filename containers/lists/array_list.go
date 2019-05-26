@@ -90,7 +90,7 @@ func (list *ArrayList) Contains(e interface{}) bool {
 
 // Slice makes a new list duplicating part of this list.
 func (list *ArrayList) Slice(i, j int) (List, error) {
-	if i < 0 || i > j || j >= list.count {
+	if i < 0 || i > j || j > list.count {
 		return nil, fmt.Errorf("Slice: illegal indecies: i = %d, j = %d", i, j)
 	}
 	result := new(ArrayList)
@@ -114,6 +114,7 @@ func (list *ArrayList) Equal(l List) bool {
 		if !ok || list.store[i] != v {
 			return false
 		}
+		v, ok = iter.Next()
 	}
 
 	return true
