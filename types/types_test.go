@@ -64,3 +64,16 @@ func ExampleErrno_Error() {
 	// good
 	// good
 }
+
+func ExampleStructLiteral() {
+	type kidlj []string
+
+	blog := "blog"
+	read := "read"
+	wiki := "wiki"
+
+	site := kidlj{blog, read, wiki}
+	fmt.Println(site)
+	// Output:
+	// [blog read wiki]
+}
