@@ -36,44 +36,66 @@ var (
 // Handlers
 //----------
 
-func createUser(c echo.Context) error {
-	u := &user{
-		ID: seq,
-	}
-	if err := c.Bind(u); err != nil {
-		return err
-	}
-	if err := c.Validate(u); err != nil {
-		return err
-	}
-	users[u.ID] = u
-	seq++
-	return c.JSON(http.StatusCreated, u)
+func responseHandler(c echo.Context) error {
+	return c.JSON(http.StatusOK, echo.Map{
+		"success": true,
+		"code":    200,
+		"message": "success",
+		"data":    c.Get("data"),
+	})
 }
 
-func getUser(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
-	return c.JSON(http.StatusOK, users[id])
+func createUser(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		u := &user{
+			ID: seq,
+		}
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+		if err := c.Validate(u); err != nil {
+			return err
+		}
+		users[u.ID] = u
+		seq++
+		c.Set("data", u)
+		return next(c)
+	}
 }
 
-func updateUser(c echo.Context) error {
-	u := new(user)
-	if err := c.Bind(u); err != nil {
-		return err
+func getUser(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		u := users[id]
+		c.Set("data", u)
+		return next(c)
 	}
-	if err := c.Validate(u); err != nil {
-		return err
-	}
-	id, _ := strconv.Atoi(c.Param("id"))
-	users[id].Name = u.Name
-	users[id].Email = u.Email
-	return c.JSON(http.StatusOK, users[id])
 }
 
-func deleteUser(c echo.Context) error {
-	id, _ := strconv.Atoi(c.Param("id"))
-	delete(users, id)
-	return c.NoContent(http.StatusNoContent)
+func updateUser(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		u := new(user)
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+		if err := c.Validate(u); err != nil {
+			return err
+		}
+		id, _ := strconv.Atoi(c.Param("id"))
+		users[id].Name = u.Name
+		users[id].Email = u.Email
+		u = users[id]
+		c.Set("data", u)
+		return next(c)
+	}
+}
+
+func deleteUser(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id, _ := strconv.Atoi(c.Param("id"))
+		delete(users, id)
+		return next(c)
+	}
 }
 
 func main() {
@@ -85,10 +107,10 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.POST("/users", createUser)
-	e.GET("/users/:id", getUser)
-	e.PUT("/users/:id", updateUser)
-	e.DELETE("/users/:id", deleteUser)
+	e.POST("/users", responseHandler, createUser)
+	e.GET("/users/:id", responseHandler, getUser)
+	e.PUT("/users/:id", responseHandler, updateUser)
+	e.DELETE("/users/:id", responseHandler, deleteUser)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
