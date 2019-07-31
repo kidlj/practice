@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-ENV VERSION 2.0.0
+ENV VERSION 3.0.0
 
 COPY echo-demo /
 

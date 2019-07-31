@@ -14,3 +14,5 @@
 vendor
 
 echo-demo
+
+.DS_Store

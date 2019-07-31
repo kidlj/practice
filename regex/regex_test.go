@@ -24,3 +24,26 @@ func TestValidNginxSize(t *testing.T) {
 		}
 	}
 }
+
+func TestValidNginxPrefix(t *testing.T) {
+	prefixes := []string{
+		"/", "/123", "/10k", "/3.20K", "/a_0k", "/中国",
+	}
+	for _, size := range prefixes {
+		ok := ValidNginxPrefix(size)
+		if !ok {
+			t.Errorf("test failed for %s", size)
+		}
+	}
+
+	badPrefixes := []string{
+		"", "aaa", " 333", "/ 10G", "/m hello", "中国",
+	}
+
+	for _, size := range badPrefixes {
+		ok := ValidNginxPrefix(size)
+		if ok {
+			t.Errorf("test failed for %s", size)
+		}
+	}
+}

@@ -16,7 +16,13 @@ func hello(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "get hostname error")
 	}
 
+	r := c.Request()
+
 	return c.JSON(http.StatusOK, echo.Map{
+		"scheme":   c.Scheme(),
+		"host":     r.Host,
+		"url":      r.URL.Path,
+		"realIP":   c.RealIP(),
 		"version":  version,
 		"hostname": hostname,
 	})
@@ -30,9 +36,7 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", hello)
-	e.GET("/test", hello)
-	e.GET("/hello", hello)
+	e.GET("/*", hello)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
