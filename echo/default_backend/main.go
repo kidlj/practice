@@ -9,7 +9,7 @@ import (
 
 // Handler
 func hello(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusServiceUnavailable, "service unavailable")
+	return echo.NewHTTPError(http.StatusNotFound, "Not Found")
 }
 
 func main() {
