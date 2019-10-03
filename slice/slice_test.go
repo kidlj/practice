@@ -118,6 +118,7 @@ func ExampleCopy() {
 	// 3
 }
 
+// https://www.v2ex.com/t/606165
 func ExampleIndex() {
 	a := []int{}
 	b := []int{0}
@@ -134,4 +135,14 @@ func ExampleIndex() {
 	// []
 	// []
 	// []
+}
+
+// cap == len by default
+func ExampleSliceCap() {
+	s := make([]int, 3)
+	fmt.Println(len(s))
+	fmt.Println(cap(s))
+	// Output:
+	// 3
+	// 3
 }
