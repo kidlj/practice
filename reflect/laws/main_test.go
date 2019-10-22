@@ -95,6 +95,7 @@ func Example_settability() {
 	fmt.Println("type of p:", p.Type())
 	fmt.Println("settability of p:", p.CanSet())
 	e := p.Elem()
+	fmt.Println("type of e:", e.Type())
 	fmt.Println("settability of e:", e.CanSet())
 	e.SetFloat(7.1)
 	fmt.Println("value of e:", e.Interface())
@@ -103,6 +104,7 @@ func Example_settability() {
 	// settability of v: false
 	// type of p: *float64
 	// settability of p: false
+	// type of e: float64
 	// settability of e: true
 	// value of e: 7.1
 	// value of x: 7.1
