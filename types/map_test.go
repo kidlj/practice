@@ -1,13 +1,36 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 func Example_Map() {
 	var m1 map[string]string
-	m1 = make(map[string]string)
-	fmt.Println(m1)
+	// m1 = make(map[string]string)
+	fmt.Println(m1 == nil)
+	_, ok := m1["hello"]
+	fmt.Println(ok)
+
+	// accessing a nil map won't panic
+	hello := m1["hello"]
+	fmt.Println(hello)
+	i, err := strconv.Atoi(hello)
+	if err != nil {
+		fmt.Println(i)
+		fmt.Println(err)
+	}
+
+	// panic: assignment to entry in nil map
+	// m1["hello"] = "world"
+	// fmt.Println(hello)
+
 	// Output:
-	// map[]
+	// true
+	// false
+	//
+	// 0
+	// strconv.Atoi: parsing "": invalid syntax
 }
 
 func Example_Map_init() {

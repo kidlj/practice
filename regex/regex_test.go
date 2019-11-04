@@ -47,3 +47,17 @@ func TestValidNginxPrefix(t *testing.T) {
 		}
 	}
 }
+
+func TestValidHeaderName(t *testing.T) {
+	headers := []string{
+		"canaryx", "canary-x",
+	}
+
+	for _, h := range headers {
+		ok := ValidHeaderName(h)
+		if !ok {
+			t.Errorf("test failed for %s", h)
+		}
+	}
+
+}

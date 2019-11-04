@@ -18,3 +18,8 @@ func ValidNginxPrefix(prefix string) bool {
 	valid := validPrefix.MatchString(prefix)
 	return valid
 }
+
+func ValidHeaderName(header string) bool {
+	validName := regexp.MustCompile(`^[a-zA-Z0-9-]+$`)
+	return validName.MatchString(header)
+}
