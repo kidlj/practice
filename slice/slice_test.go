@@ -9,7 +9,7 @@ import "fmt"
 // Updating the slice variable is required not just when calling append, but
 // for any function that may change the length or capacity of a slice or make
 // it refer to a different underlying array. (Go book p91)
-func ExampleSliceAppendSlice() {
+func ExampleSliceAppend() {
 	a := make([]int, 0, 10000)
 	b := a
 	a = append(a, 1)
@@ -33,6 +33,15 @@ func ExampleSliceAppendSlice() {
 	// Javascript Output:
 	// [1, 2, 3, 4]
 	// [1, 2, 3, 4]
+}
+
+func ExampleSliceAppendSlice() {
+	a := []int{1, 2, 3}
+	b := []int{4, 5, 6}
+	a = append(a, b...)
+	fmt.Println(a)
+	// Output:
+	// [1 2 3 4 5 6]
 }
 
 func ExampleSliceModify() {
