@@ -1,0 +1,33 @@
+{{ define "conf" }}
+{
+	Server: [
+		{{- range .Servers }}
+		{
+			Name: {{ .Name }}
+			TLS: {
+				Cert: {{ .TLS.Cert }}
+				Key: {{ .TLS.Key }}
+			}
+			Location: [
+				{{- range .Location }}
+				{
+					Path: {{ .Path }}
+					Canary: {{ .Canary }}
+					Services: [
+						{{- range .Services }}
+						{
+							{{- $ServiceName := .Name }}
+							Name: {{ .Name }}
+							Port: {{ .Port }}
+							ServiceName: {{ $ServiceName }}
+						}	
+						{{- end }}
+					]
+				}
+				{{- end }}
+			]
+		}
+		{{- end }}
+	]
+}
+{{ end }}

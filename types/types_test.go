@@ -11,6 +11,10 @@ func (a StringArray) Get(index int) string {
 	return a[index]
 }
 
+func (a StringArray) String() string {
+	return "hello"
+}
+
 // This example shows that:
 // "The underlying type of a named type determines its structure and representation, and also the set of intrinsic operations it supports,
 // which are the same as if the underlying type had been used directly." -- The Go Book p40
@@ -76,4 +80,40 @@ func ExampleStructLiteral() {
 	fmt.Println(site)
 	// Output:
 	// [blog read wiki]
+}
+
+func Example_Nil_Slice() {
+	var s []int
+	fmt.Printf("s == nil: %t\n", s == nil)
+	// Output:
+	// s == nil: true
+}
+
+func Example_Nil_Pointer() {
+	var s StringArray
+	fmt.Printf("s == nil: %t\n", s == nil)
+	fmt.Println(s.String())
+	// Output:
+	// s == nil: true
+	// hello
+}
+
+type Employee struct {
+	ID     int
+	Name   string
+	Salary int
+}
+
+func EmployeeByID(id int) Employee {
+	return Employee{
+		ID:     1,
+		Name:   "m",
+		Salary: 100,
+	}
+}
+
+// gopl p100.
+func Example_Value_Variable() {
+	// cannot assign to EmployeeByID(3).Salary (value of type int) compiler
+	EmployeeByID(3).Salary = 0
 }
