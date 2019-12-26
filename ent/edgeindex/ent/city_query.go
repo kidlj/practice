@@ -9,6 +9,8 @@ import (
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/kidlj/demo/ent/edgeindex/ent/city"
 	"github.com/kidlj/demo/ent/edgeindex/ent/predicate"
 	"github.com/kidlj/demo/ent/edgeindex/ent/street"
@@ -22,7 +24,7 @@ type CityQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.City
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -53,12 +55,12 @@ func (cq *CityQuery) Order(o ...Order) *CityQuery {
 // QueryStreets chains the current query on the streets edge.
 func (cq *CityQuery) QueryStreets() *StreetQuery {
 	query := &StreetQuery{config: cq.config}
-	step := sql.NewStep(
-		sql.From(city.Table, city.FieldID, cq.sqlQuery()),
-		sql.To(street.Table, street.FieldID),
-		sql.Edge(sql.O2M, false, city.StreetsTable, city.StreetsColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(city.Table, city.FieldID, cq.sqlQuery()),
+		sqlgraph.To(street.Table, street.FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, city.StreetsTable, city.StreetsColumn),
 	)
-	query.sql = sql.SetNeighbors(cq.driver.Dialect(), step)
+	query.sql = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 	return query
 }
 
@@ -226,7 +228,7 @@ func (cq *CityQuery) Clone() *CityQuery {
 		order:      append([]Order{}, cq.order...),
 		unique:     append([]string{}, cq.unique...),
 		predicates: append([]predicate.City{}, cq.predicates...),
-		// clone intermediate queries.
+		// clone intermediate query.
 		sql: cq.sql.Clone(),
 	}
 }
@@ -273,45 +275,31 @@ func (cq *CityQuery) Select(field string, fields ...string) *CitySelect {
 }
 
 func (cq *CityQuery) sqlAll(ctx context.Context) ([]*City, error) {
-	rows := &sql.Rows{}
-	selector := cq.sqlQuery()
-	if unique := cq.unique; len(unique) == 0 {
-		selector.Distinct()
+	var (
+		nodes []*City
+		spec  = cq.querySpec()
+	)
+	spec.ScanValues = func() []interface{} {
+		node := &City{config: cq.config}
+		nodes = append(nodes, node)
+		return node.scanValues()
 	}
-	query, args := selector.Query()
-	if err := cq.driver.Query(ctx, query, args, rows); err != nil {
+	spec.Assign = func(values ...interface{}) error {
+		if len(nodes) == 0 {
+			return fmt.Errorf("ent: Assign called without calling ScanValues")
+		}
+		node := nodes[len(nodes)-1]
+		return node.assignValues(values...)
+	}
+	if err := sqlgraph.QueryNodes(ctx, cq.driver, spec); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var cs Cities
-	if err := cs.FromRows(rows); err != nil {
-		return nil, err
-	}
-	cs.config(cq.config)
-	return cs, nil
+	return nodes, nil
 }
 
 func (cq *CityQuery) sqlCount(ctx context.Context) (int, error) {
-	rows := &sql.Rows{}
-	selector := cq.sqlQuery()
-	unique := []string{city.FieldID}
-	if len(cq.unique) > 0 {
-		unique = cq.unique
-	}
-	selector.Count(sql.Distinct(selector.Columns(unique...)...))
-	query, args := selector.Query()
-	if err := cq.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return 0, errors.New("ent: no rows found")
-	}
-	var n int
-	if err := rows.Scan(&n); err != nil {
-		return 0, fmt.Errorf("ent: failed reading count: %v", err)
-	}
-	return n, nil
+	spec := cq.querySpec()
+	return sqlgraph.CountNodes(ctx, cq.driver, spec)
 }
 
 func (cq *CityQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -320,6 +308,42 @@ func (cq *CityQuery) sqlExist(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
+}
+
+func (cq *CityQuery) querySpec() *sqlgraph.QuerySpec {
+	spec := &sqlgraph.QuerySpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   city.Table,
+			Columns: city.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: city.FieldID,
+			},
+		},
+		From:   cq.sql,
+		Unique: true,
+	}
+	if ps := cq.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	if limit := cq.limit; limit != nil {
+		spec.Limit = *limit
+	}
+	if offset := cq.offset; offset != nil {
+		spec.Offset = *offset
+	}
+	if ps := cq.order; len(ps) > 0 {
+		spec.Order = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	return spec
 }
 
 func (cq *CityQuery) sqlQuery() *sql.Selector {
@@ -352,7 +376,7 @@ type CityGroupBy struct {
 	config
 	fields []string
 	fns    []Aggregate
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -473,7 +497,7 @@ func (cgb *CityGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(cgb.fields)+len(cgb.fns))
 	columns = append(columns, cgb.fields...)
 	for _, fn := range cgb.fns {
-		columns = append(columns, fn.SQL(selector))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(cgb.fields...)
 }
@@ -593,7 +617,7 @@ func (cs *CitySelect) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (cs *CitySelect) sqlQuery() sql.Querier {
-	view := "city_view"
-	return sql.Dialect(cs.driver.Dialect()).
-		Select(cs.fields...).From(cs.sql.As(view))
+	selector := cs.sql
+	selector.Select(selector.Columns(cs.fields...)...)
+	return selector
 }

@@ -7,7 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/kidlj/demo/ent/mixins/ent/pet"
 )
 
@@ -68,34 +69,46 @@ func (pc *PetCreate) SaveX(ctx context.Context) *Pet {
 
 func (pc *PetCreate) sqlSave(ctx context.Context) (*Pet, error) {
 	var (
-		builder = sql.Dialect(pc.driver.Dialect())
-		pe      = &Pet{config: pc.config}
+		pe   = &Pet{config: pc.config}
+		spec = &sqlgraph.CreateSpec{
+			Table: pet.Table,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: pet.FieldID,
+			},
+		}
 	)
-	tx, err := pc.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	insert := builder.Insert(pet.Table).Default()
 	if value := pc.age; value != nil {
-		insert.Set(pet.FieldAge, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  *value,
+			Column: pet.FieldAge,
+		})
 		pe.Age = *value
 	}
 	if value := pc.name; value != nil {
-		insert.Set(pet.FieldName, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: pet.FieldName,
+		})
 		pe.Name = *value
 	}
 	if value := pc.weight; value != nil {
-		insert.Set(pet.FieldWeight, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  *value,
+			Column: pet.FieldWeight,
+		})
 		pe.Weight = *value
 	}
-
-	id, err := insertLastID(ctx, tx, insert.Returning(pet.FieldID))
-	if err != nil {
-		return nil, rollback(tx, err)
-	}
-	pe.ID = int(id)
-	if err := tx.Commit(); err != nil {
+	if err := sqlgraph.CreateNode(ctx, pc.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return nil, err
 	}
+	id := spec.ID.Value.(int64)
+	pe.ID = int(id)
 	return pe, nil
 }

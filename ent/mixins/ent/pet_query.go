@@ -9,6 +9,8 @@ import (
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/kidlj/demo/ent/mixins/ent/pet"
 	"github.com/kidlj/demo/ent/mixins/ent/predicate"
 )
@@ -21,7 +23,7 @@ type PetQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.Pet
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -213,7 +215,7 @@ func (pq *PetQuery) Clone() *PetQuery {
 		order:      append([]Order{}, pq.order...),
 		unique:     append([]string{}, pq.unique...),
 		predicates: append([]predicate.Pet{}, pq.predicates...),
-		// clone intermediate queries.
+		// clone intermediate query.
 		sql: pq.sql.Clone(),
 	}
 }
@@ -260,45 +262,31 @@ func (pq *PetQuery) Select(field string, fields ...string) *PetSelect {
 }
 
 func (pq *PetQuery) sqlAll(ctx context.Context) ([]*Pet, error) {
-	rows := &sql.Rows{}
-	selector := pq.sqlQuery()
-	if unique := pq.unique; len(unique) == 0 {
-		selector.Distinct()
+	var (
+		nodes []*Pet
+		spec  = pq.querySpec()
+	)
+	spec.ScanValues = func() []interface{} {
+		node := &Pet{config: pq.config}
+		nodes = append(nodes, node)
+		return node.scanValues()
 	}
-	query, args := selector.Query()
-	if err := pq.driver.Query(ctx, query, args, rows); err != nil {
+	spec.Assign = func(values ...interface{}) error {
+		if len(nodes) == 0 {
+			return fmt.Errorf("ent: Assign called without calling ScanValues")
+		}
+		node := nodes[len(nodes)-1]
+		return node.assignValues(values...)
+	}
+	if err := sqlgraph.QueryNodes(ctx, pq.driver, spec); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var pes Pets
-	if err := pes.FromRows(rows); err != nil {
-		return nil, err
-	}
-	pes.config(pq.config)
-	return pes, nil
+	return nodes, nil
 }
 
 func (pq *PetQuery) sqlCount(ctx context.Context) (int, error) {
-	rows := &sql.Rows{}
-	selector := pq.sqlQuery()
-	unique := []string{pet.FieldID}
-	if len(pq.unique) > 0 {
-		unique = pq.unique
-	}
-	selector.Count(sql.Distinct(selector.Columns(unique...)...))
-	query, args := selector.Query()
-	if err := pq.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return 0, errors.New("ent: no rows found")
-	}
-	var n int
-	if err := rows.Scan(&n); err != nil {
-		return 0, fmt.Errorf("ent: failed reading count: %v", err)
-	}
-	return n, nil
+	spec := pq.querySpec()
+	return sqlgraph.CountNodes(ctx, pq.driver, spec)
 }
 
 func (pq *PetQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -307,6 +295,42 @@ func (pq *PetQuery) sqlExist(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
+}
+
+func (pq *PetQuery) querySpec() *sqlgraph.QuerySpec {
+	spec := &sqlgraph.QuerySpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   pet.Table,
+			Columns: pet.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: pet.FieldID,
+			},
+		},
+		From:   pq.sql,
+		Unique: true,
+	}
+	if ps := pq.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	if limit := pq.limit; limit != nil {
+		spec.Limit = *limit
+	}
+	if offset := pq.offset; offset != nil {
+		spec.Offset = *offset
+	}
+	if ps := pq.order; len(ps) > 0 {
+		spec.Order = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	return spec
 }
 
 func (pq *PetQuery) sqlQuery() *sql.Selector {
@@ -339,7 +363,7 @@ type PetGroupBy struct {
 	config
 	fields []string
 	fns    []Aggregate
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -460,7 +484,7 @@ func (pgb *PetGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(pgb.fields)+len(pgb.fns))
 	columns = append(columns, pgb.fields...)
 	for _, fn := range pgb.fns {
-		columns = append(columns, fn.SQL(selector))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(pgb.fields...)
 }
@@ -580,7 +604,7 @@ func (ps *PetSelect) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (ps *PetSelect) sqlQuery() sql.Querier {
-	view := "pet_view"
-	return sql.Dialect(ps.driver.Dialect()).
-		Select(ps.fields...).From(ps.sql.As(view))
+	selector := ps.sql
+	selector.Select(selector.Columns(ps.fields...)...)
+	return selector
 }

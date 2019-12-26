@@ -9,6 +9,8 @@ import (
 	"math"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/kidlj/demo/ent/edgeindex/ent/city"
 	"github.com/kidlj/demo/ent/edgeindex/ent/predicate"
 	"github.com/kidlj/demo/ent/edgeindex/ent/street"
@@ -22,7 +24,7 @@ type StreetQuery struct {
 	order      []Order
 	unique     []string
 	predicates []predicate.Street
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -53,12 +55,12 @@ func (sq *StreetQuery) Order(o ...Order) *StreetQuery {
 // QueryCity chains the current query on the city edge.
 func (sq *StreetQuery) QueryCity() *CityQuery {
 	query := &CityQuery{config: sq.config}
-	step := sql.NewStep(
-		sql.From(street.Table, street.FieldID, sq.sqlQuery()),
-		sql.To(city.Table, city.FieldID),
-		sql.Edge(sql.M2O, true, street.CityTable, street.CityColumn),
+	step := sqlgraph.NewStep(
+		sqlgraph.From(street.Table, street.FieldID, sq.sqlQuery()),
+		sqlgraph.To(city.Table, city.FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, street.CityTable, street.CityColumn),
 	)
-	query.sql = sql.SetNeighbors(sq.driver.Dialect(), step)
+	query.sql = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 	return query
 }
 
@@ -226,7 +228,7 @@ func (sq *StreetQuery) Clone() *StreetQuery {
 		order:      append([]Order{}, sq.order...),
 		unique:     append([]string{}, sq.unique...),
 		predicates: append([]predicate.Street{}, sq.predicates...),
-		// clone intermediate queries.
+		// clone intermediate query.
 		sql: sq.sql.Clone(),
 	}
 }
@@ -273,45 +275,31 @@ func (sq *StreetQuery) Select(field string, fields ...string) *StreetSelect {
 }
 
 func (sq *StreetQuery) sqlAll(ctx context.Context) ([]*Street, error) {
-	rows := &sql.Rows{}
-	selector := sq.sqlQuery()
-	if unique := sq.unique; len(unique) == 0 {
-		selector.Distinct()
+	var (
+		nodes []*Street
+		spec  = sq.querySpec()
+	)
+	spec.ScanValues = func() []interface{} {
+		node := &Street{config: sq.config}
+		nodes = append(nodes, node)
+		return node.scanValues()
 	}
-	query, args := selector.Query()
-	if err := sq.driver.Query(ctx, query, args, rows); err != nil {
+	spec.Assign = func(values ...interface{}) error {
+		if len(nodes) == 0 {
+			return fmt.Errorf("ent: Assign called without calling ScanValues")
+		}
+		node := nodes[len(nodes)-1]
+		return node.assignValues(values...)
+	}
+	if err := sqlgraph.QueryNodes(ctx, sq.driver, spec); err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var sSlice Streets
-	if err := sSlice.FromRows(rows); err != nil {
-		return nil, err
-	}
-	sSlice.config(sq.config)
-	return sSlice, nil
+	return nodes, nil
 }
 
 func (sq *StreetQuery) sqlCount(ctx context.Context) (int, error) {
-	rows := &sql.Rows{}
-	selector := sq.sqlQuery()
-	unique := []string{street.FieldID}
-	if len(sq.unique) > 0 {
-		unique = sq.unique
-	}
-	selector.Count(sql.Distinct(selector.Columns(unique...)...))
-	query, args := selector.Query()
-	if err := sq.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-	if !rows.Next() {
-		return 0, errors.New("ent: no rows found")
-	}
-	var n int
-	if err := rows.Scan(&n); err != nil {
-		return 0, fmt.Errorf("ent: failed reading count: %v", err)
-	}
-	return n, nil
+	spec := sq.querySpec()
+	return sqlgraph.CountNodes(ctx, sq.driver, spec)
 }
 
 func (sq *StreetQuery) sqlExist(ctx context.Context) (bool, error) {
@@ -320,6 +308,42 @@ func (sq *StreetQuery) sqlExist(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("ent: check existence: %v", err)
 	}
 	return n > 0, nil
+}
+
+func (sq *StreetQuery) querySpec() *sqlgraph.QuerySpec {
+	spec := &sqlgraph.QuerySpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   street.Table,
+			Columns: street.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: street.FieldID,
+			},
+		},
+		From:   sq.sql,
+		Unique: true,
+	}
+	if ps := sq.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	if limit := sq.limit; limit != nil {
+		spec.Limit = *limit
+	}
+	if offset := sq.offset; offset != nil {
+		spec.Offset = *offset
+	}
+	if ps := sq.order; len(ps) > 0 {
+		spec.Order = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
+	return spec
 }
 
 func (sq *StreetQuery) sqlQuery() *sql.Selector {
@@ -352,7 +376,7 @@ type StreetGroupBy struct {
 	config
 	fields []string
 	fns    []Aggregate
-	// intermediate queries.
+	// intermediate query.
 	sql *sql.Selector
 }
 
@@ -473,7 +497,7 @@ func (sgb *StreetGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(sgb.fields)+len(sgb.fns))
 	columns = append(columns, sgb.fields...)
 	for _, fn := range sgb.fns {
-		columns = append(columns, fn.SQL(selector))
+		columns = append(columns, fn(selector))
 	}
 	return selector.Select(columns...).GroupBy(sgb.fields...)
 }
@@ -593,7 +617,7 @@ func (ss *StreetSelect) sqlScan(ctx context.Context, v interface{}) error {
 }
 
 func (ss *StreetSelect) sqlQuery() sql.Querier {
-	view := "street_view"
-	return sql.Dialect(ss.driver.Dialect()).
-		Select(ss.fields...).From(ss.sql.As(view))
+	selector := ss.sql
+	selector.Select(selector.Columns(ss.fields...)...)
+	return selector
 }

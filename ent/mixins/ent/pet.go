@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/kidlj/demo/ent/mixins/ent/pet"
 )
 
 // Pet is the model entity for the Pet schema.
@@ -22,27 +23,43 @@ type Pet struct {
 	Weight float64 `json:"weight,omitempty"`
 }
 
-// FromRows scans the sql response data into Pet.
-func (pe *Pet) FromRows(rows *sql.Rows) error {
-	var scanpe struct {
-		ID     int
-		Age    sql.NullInt64
-		Name   sql.NullString
-		Weight sql.NullFloat64
+// scanValues returns the types for scanning values from sql.Rows.
+func (*Pet) scanValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{},
+		&sql.NullInt64{},
+		&sql.NullString{},
+		&sql.NullFloat64{},
 	}
-	// the order here should be the same as in the `pet.Columns`.
-	if err := rows.Scan(
-		&scanpe.ID,
-		&scanpe.Age,
-		&scanpe.Name,
-		&scanpe.Weight,
-	); err != nil {
-		return err
+}
+
+// assignValues assigns the values that were returned from sql.Rows (after scanning)
+// to the Pet fields.
+func (pe *Pet) assignValues(values ...interface{}) error {
+	if m, n := len(values), len(pet.Columns); m != n {
+		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	pe.ID = scanpe.ID
-	pe.Age = int(scanpe.Age.Int64)
-	pe.Name = scanpe.Name.String
-	pe.Weight = scanpe.Weight.Float64
+	value, ok := values[0].(*sql.NullInt64)
+	if !ok {
+		return fmt.Errorf("unexpected type %T for field id", value)
+	}
+	pe.ID = int(value.Int64)
+	values = values[1:]
+	if value, ok := values[0].(*sql.NullInt64); !ok {
+		return fmt.Errorf("unexpected type %T for field age", values[0])
+	} else if value.Valid {
+		pe.Age = int(value.Int64)
+	}
+	if value, ok := values[1].(*sql.NullString); !ok {
+		return fmt.Errorf("unexpected type %T for field name", values[1])
+	} else if value.Valid {
+		pe.Name = value.String
+	}
+	if value, ok := values[2].(*sql.NullFloat64); !ok {
+		return fmt.Errorf("unexpected type %T for field weight", values[2])
+	} else if value.Valid {
+		pe.Weight = value.Float64
+	}
 	return nil
 }
 
@@ -81,18 +98,6 @@ func (pe *Pet) String() string {
 
 // Pets is a parsable slice of Pet.
 type Pets []*Pet
-
-// FromRows scans the sql response data into Pets.
-func (pe *Pets) FromRows(rows *sql.Rows) error {
-	for rows.Next() {
-		scanpe := &Pet{}
-		if err := scanpe.FromRows(rows); err != nil {
-			return err
-		}
-		*pe = append(*pe, scanpe)
-	}
-	return nil
-}
 
 func (pe Pets) config(cfg config) {
 	for _i := range pe {

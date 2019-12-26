@@ -7,6 +7,8 @@ import (
 	"fmt"
 
 	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/kidlj/demo/ent/mixins/ent/pet"
 	"github.com/kidlj/demo/ent/mixins/ent/predicate"
 )
@@ -106,66 +108,65 @@ func (pu *PetUpdate) ExecX(ctx context.Context) {
 }
 
 func (pu *PetUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	var (
-		builder  = sql.Dialect(pu.driver.Dialect())
-		selector = builder.Select(pet.FieldID).From(builder.Table(pet.Table))
-	)
-	for _, p := range pu.predicates {
-		p(selector)
+	spec := &sqlgraph.UpdateSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   pet.Table,
+			Columns: pet.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: pet.FieldID,
+			},
+		},
 	}
-	rows := &sql.Rows{}
-	query, args := selector.Query()
-	if err = pu.driver.Query(ctx, query, args, rows); err != nil {
-		return 0, err
-	}
-	defer rows.Close()
-
-	var ids []int
-	for rows.Next() {
-		var id int
-		if err := rows.Scan(&id); err != nil {
-			return 0, fmt.Errorf("ent: failed reading id: %v", err)
+	if ps := pu.predicates; len(ps) > 0 {
+		spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
 		}
-		ids = append(ids, id)
 	}
-	if len(ids) == 0 {
-		return 0, nil
-	}
-
-	tx, err := pu.driver.Tx(ctx)
-	if err != nil {
-		return 0, err
-	}
-	var (
-		res     sql.Result
-		updater = builder.Update(pet.Table)
-	)
-	updater = updater.Where(sql.InInts(pet.FieldID, ids...))
 	if value := pu.age; value != nil {
-		updater.Set(pet.FieldAge, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  *value,
+			Column: pet.FieldAge,
+		})
 	}
 	if value := pu.addage; value != nil {
-		updater.Add(pet.FieldAge, *value)
+		spec.Fields.Add = append(spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  *value,
+			Column: pet.FieldAge,
+		})
 	}
 	if value := pu.name; value != nil {
-		updater.Set(pet.FieldName, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: pet.FieldName,
+		})
 	}
 	if value := pu.weight; value != nil {
-		updater.Set(pet.FieldWeight, *value)
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  *value,
+			Column: pet.FieldWeight,
+		})
 	}
 	if value := pu.addweight; value != nil {
-		updater.Add(pet.FieldWeight, *value)
+		spec.Fields.Add = append(spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  *value,
+			Column: pet.FieldWeight,
+		})
 	}
-	if !updater.Empty() {
-		query, args := updater.Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return 0, rollback(tx, err)
+	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
 		}
-	}
-	if err = tx.Commit(); err != nil {
 		return 0, err
 	}
-	return len(ids), nil
+	return n, nil
 }
 
 // PetUpdateOne is the builder for updating a single Pet entity.
@@ -257,71 +258,59 @@ func (puo *PetUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (puo *PetUpdateOne) sqlSave(ctx context.Context) (pe *Pet, err error) {
-	var (
-		builder  = sql.Dialect(puo.driver.Dialect())
-		selector = builder.Select(pet.Columns...).From(builder.Table(pet.Table))
-	)
-	pet.ID(puo.id)(selector)
-	rows := &sql.Rows{}
-	query, args := selector.Query()
-	if err = puo.driver.Query(ctx, query, args, rows); err != nil {
-		return nil, err
+	spec := &sqlgraph.UpdateSpec{
+		Node: &sqlgraph.NodeSpec{
+			Table:   pet.Table,
+			Columns: pet.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Value:  puo.id,
+				Type:   field.TypeInt,
+				Column: pet.FieldID,
+			},
+		},
 	}
-	defer rows.Close()
-
-	var ids []int
-	for rows.Next() {
-		var id int
-		pe = &Pet{config: puo.config}
-		if err := pe.FromRows(rows); err != nil {
-			return nil, fmt.Errorf("ent: failed scanning row into Pet: %v", err)
-		}
-		id = pe.ID
-		ids = append(ids, id)
-	}
-	switch n := len(ids); {
-	case n == 0:
-		return nil, &ErrNotFound{fmt.Sprintf("Pet with id: %v", puo.id)}
-	case n > 1:
-		return nil, fmt.Errorf("ent: more than one Pet with the same id: %v", puo.id)
-	}
-
-	tx, err := puo.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	var (
-		res     sql.Result
-		updater = builder.Update(pet.Table)
-	)
-	updater = updater.Where(sql.InInts(pet.FieldID, ids...))
 	if value := puo.age; value != nil {
-		updater.Set(pet.FieldAge, *value)
-		pe.Age = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  *value,
+			Column: pet.FieldAge,
+		})
 	}
 	if value := puo.addage; value != nil {
-		updater.Add(pet.FieldAge, *value)
-		pe.Age += *value
+		spec.Fields.Add = append(spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  *value,
+			Column: pet.FieldAge,
+		})
 	}
 	if value := puo.name; value != nil {
-		updater.Set(pet.FieldName, *value)
-		pe.Name = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: pet.FieldName,
+		})
 	}
 	if value := puo.weight; value != nil {
-		updater.Set(pet.FieldWeight, *value)
-		pe.Weight = *value
+		spec.Fields.Set = append(spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  *value,
+			Column: pet.FieldWeight,
+		})
 	}
 	if value := puo.addweight; value != nil {
-		updater.Add(pet.FieldWeight, *value)
-		pe.Weight += *value
+		spec.Fields.Add = append(spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeFloat64,
+			Value:  *value,
+			Column: pet.FieldWeight,
+		})
 	}
-	if !updater.Empty() {
-		query, args := updater.Query()
-		if err := tx.Exec(ctx, query, args, &res); err != nil {
-			return nil, rollback(tx, err)
+	pe = &Pet{config: puo.config}
+	spec.Assign = pe.assignValues
+	spec.ScanValues = pe.scanValues()
+	if err = sqlgraph.UpdateNode(ctx, puo.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
 		}
-	}
-	if err = tx.Commit(); err != nil {
 		return nil, err
 	}
 	return pe, nil

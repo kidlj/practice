@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/facebookincubator/ent/dialect/sql"
+	"github.com/facebookincubator/ent/dialect/sql/sqlgraph"
+	"github.com/facebookincubator/ent/schema/field"
 	"github.com/kidlj/demo/ent/mixins/ent/user"
 )
 
@@ -107,42 +108,62 @@ func (uc *UserCreate) SaveX(ctx context.Context) *User {
 
 func (uc *UserCreate) sqlSave(ctx context.Context) (*User, error) {
 	var (
-		builder = sql.Dialect(uc.driver.Dialect())
-		u       = &User{config: uc.config}
+		u    = &User{config: uc.config}
+		spec = &sqlgraph.CreateSpec{
+			Table: user.Table,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: user.FieldID,
+			},
+		}
 	)
-	tx, err := uc.driver.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	insert := builder.Insert(user.Table).Default()
 	if value := uc.created_at; value != nil {
-		insert.Set(user.FieldCreatedAt, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: user.FieldCreatedAt,
+		})
 		u.CreatedAt = *value
 	}
 	if value := uc.updated_at; value != nil {
-		insert.Set(user.FieldUpdatedAt, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  *value,
+			Column: user.FieldUpdatedAt,
+		})
 		u.UpdatedAt = *value
 	}
 	if value := uc.age; value != nil {
-		insert.Set(user.FieldAge, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  *value,
+			Column: user.FieldAge,
+		})
 		u.Age = *value
 	}
 	if value := uc.name; value != nil {
-		insert.Set(user.FieldName, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldName,
+		})
 		u.Name = *value
 	}
 	if value := uc.nickname; value != nil {
-		insert.Set(user.FieldNickname, *value)
+		spec.Fields = append(spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  *value,
+			Column: user.FieldNickname,
+		})
 		u.Nickname = *value
 	}
-
-	id, err := insertLastID(ctx, tx, insert.Returning(user.FieldID))
-	if err != nil {
-		return nil, rollback(tx, err)
-	}
-	u.ID = int(id)
-	if err := tx.Commit(); err != nil {
+	if err := sqlgraph.CreateNode(ctx, uc.driver, spec); err != nil {
+		if cerr, ok := isSQLConstraintError(err); ok {
+			err = cerr
+		}
 		return nil, err
 	}
+	id := spec.ID.Value.(int64)
+	u.ID = int(id)
 	return u, nil
 }
