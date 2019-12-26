@@ -6,16 +6,16 @@ import (
 	"context"
 
 	"github.com/facebookincubator/ent/dialect"
-	"github.com/kidlj/demo/ent/edgeindex/ent/migrate"
+	"github.com/kidlj/demo/ent/mixins/ent/migrate"
 )
 
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// City is the client for interacting with the City builders.
-	City *CityClient
-	// Street is the client for interacting with the Street builders.
-	Street *StreetClient
+	// Pet is the client for interacting with the Pet builders.
+	Pet *PetClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 }
 
 // Commit commits the transaction.
@@ -33,8 +33,8 @@ func (tx *Tx) Client() *Client {
 	return &Client{
 		config: tx.config,
 		Schema: migrate.NewSchema(tx.driver),
-		City:   NewCityClient(tx.config),
-		Street: NewStreetClient(tx.config),
+		Pet:    NewPetClient(tx.config),
+		User:   NewUserClient(tx.config),
 	}
 }
 
@@ -45,7 +45,7 @@ func (tx *Tx) Client() *Client {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: City.QueryXXX(), the query will be executed
+// applies a query, for example: Pet.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

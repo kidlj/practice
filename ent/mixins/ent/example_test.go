@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/facebookincubator/ent/dialect/sql"
 )
@@ -15,7 +16,7 @@ import (
 //
 var dsn string
 
-func ExampleCity() {
+func ExamplePet() {
 	if dsn == "" {
 		return
 	}
@@ -26,31 +27,22 @@ func ExampleCity() {
 	}
 	defer drv.Close()
 	client := NewClient(Driver(drv))
-	// creating vertices for the city's edges.
-	s0 := client.Street.
-		Create().
-		SetName("string").
-		SaveX(ctx)
-	log.Println("street created:", s0)
+	// creating vertices for the pet's edges.
 
-	// create city vertex with its edges.
-	c := client.City.
+	// create pet vertex with its edges.
+	pe := client.Pet.
 		Create().
+		SetAge(1).
 		SetName("string").
-		AddStreets(s0).
+		SetWeight(1).
 		SaveX(ctx)
-	log.Println("city created:", c)
+	log.Println("pet created:", pe)
 
 	// query edges.
-	s0, err = c.QueryStreets().First(ctx)
-	if err != nil {
-		log.Fatalf("failed querying streets: %v", err)
-	}
-	log.Println("streets found:", s0)
 
 	// Output:
 }
-func ExampleStreet() {
+func ExampleUser() {
 	if dsn == "" {
 		return
 	}
@@ -61,14 +53,18 @@ func ExampleStreet() {
 	}
 	defer drv.Close()
 	client := NewClient(Driver(drv))
-	// creating vertices for the street's edges.
+	// creating vertices for the user's edges.
 
-	// create street vertex with its edges.
-	s := client.Street.
+	// create user vertex with its edges.
+	u := client.User.
 		Create().
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
+		SetAge(1).
 		SetName("string").
+		SetNickname("string").
 		SaveX(ctx)
-	log.Println("street created:", s)
+	log.Println("user created:", u)
 
 	// query edges.
 
