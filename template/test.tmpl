@@ -16,7 +16,7 @@
 					Services: [
 						{{- range .Services }}
 						{
-							{{- $ServiceName := .Name }}
+							{{- $ServiceName := .Name }}  a 
 							Name: {{ .Name }}
 							Port: {{ .Port }}
 							ServiceName: {{ $ServiceName }}

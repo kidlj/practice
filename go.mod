@@ -8,7 +8,7 @@ require (
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/facebookincubator/ent v0.0.0-20191204174450-bb051603ac71
+	github.com/facebookincubator/ent v0.0.0-20191225092410-b6cfa43af6ea
 	github.com/go-pg/pg v8.0.3+incompatible
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
