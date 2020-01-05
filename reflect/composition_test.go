@@ -42,6 +42,7 @@ func Example_Argument() {
 	fmt.Println(typ(Point.Distance))
 	fmt.Println(c.Hello())
 	fmt.Println(typ(c.Hello))
+	fmt.Println(typ(Circle.Hello))
 
 	// Output:
 	// 1
@@ -51,6 +52,8 @@ func Example_Argument() {
 	// hello
 	// 0
 	// None
+	// 1
+	// Circle
 }
 
 func typ(t interface{}) string {

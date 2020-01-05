@@ -115,5 +115,5 @@ func EmployeeByID(id int) Employee {
 // gopl p100.
 func Example_Value_Variable() {
 	// cannot assign to EmployeeByID(3).Salary (value of type int) compiler
-	EmployeeByID(3).Salary = 0
+	// EmployeeByID(3).Salary = 0
 }
