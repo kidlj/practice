@@ -1,12 +1,12 @@
 package main
 
-import "github.com/kidlj/demo/gopl.io/ch5/links"
+import (
+	"fmt"
+	"log"
+	"os"
 
-import "log"
-
-import "fmt"
-
-import "os"
+	"github.com/kidlj/demo/gopl.io/ch5/links"
+)
 
 func main() {
 	breadthFirst(os.Args[1:], crawl)
