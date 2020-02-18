@@ -44,15 +44,19 @@ func Example_ValueOf() {
 	v := reflect.ValueOf(x)
 	fmt.Println("type:", v.Type())
 	fmt.Println("kind:", v.Kind())
+	fmt.Println("value:", v) // by default the fmt package digs into a reflect.Value to show the concrete value inside
 	fmt.Println("value:", v.Float())
 	// Output:
 	// value: <float64 Value>
 	// type: float64
 	// kind: float64
 	// value: 3.4
+	// value: 3.4
 }
 
 func Example_Getter() {
+	// To keep the API simple, the "getter" and "setter" methods of Value operate on the largest type that can hold the value.
+	// That is, the Int method of Value returns an int64 and the SetInt value takes an int64.
 	var x uint8 = 'x'
 	v := reflect.ValueOf(x)
 	fmt.Println("type:", v.Type())
@@ -70,8 +74,12 @@ func Example_Kind() {
 	type MyInt int
 	var x MyInt = 7
 	v := reflect.ValueOf(x)
+	fmt.Println("type:", v.Type())
+	// The `Kind` of a reflection object describes the underlying type, not the static type
+	// In other words, the `Kind` cannot discriminate an int from a MyInt even though the `Type` can.
 	fmt.Println("kind:", v.Kind())
 	// Output:
+	// type: main.MyInt
 	// kind: int
 }
 
@@ -80,6 +88,8 @@ func Example_Interface() {
 	v := reflect.ValueOf(x)
 	fmt.Println("value:", v.Interface().(float64))
 	fmt.Println("value:", v.Interface())
+	// This is odd.
+	// see (Why not fmt.Println(v)? Because v is a reflect.Value; we want the concrete value it holds.)
 	fmt.Println("value:", v)
 	// Output:
 	// value: 3.4
