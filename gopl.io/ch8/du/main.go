@@ -33,6 +33,12 @@ func main() {
 		close(fileSizes)
 	}()
 
+	// Cancel traversal when input is detected.
+	go func() {
+		os.Stdin.Read(make([]byte, 1))
+		close(done)
+	}()
+
 	var nfiles, nbytes int64
 	var tick <-chan time.Time
 	if *verbose {
@@ -41,6 +47,12 @@ func main() {
 loop:
 	for {
 		select {
+		case <-done:
+			// Drain fileSizes
+			for range fileSizes {
+				// Do nothing.
+			}
+			panic("debug cancellation")
 		case size, ok := <-fileSizes:
 			if !ok {
 				break loop
@@ -54,10 +66,14 @@ loop:
 	printDiskUsage(nfiles, nbytes)
 }
 
-var sema = make(chan struct{}, 10)
+var sema = make(chan struct{}, 20)
 
 func dirents(dir string) []os.FileInfo {
-	sema <- struct{}{}        // acquire token
+	select {
+	case sema <- struct{}{}: // acquire token
+	case <-done:
+		return nil
+	}
 	defer func() { <-sema }() // release token
 	entries, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -69,6 +85,9 @@ func dirents(dir string) []os.FileInfo {
 
 func walkDir(dir string, n *sync.WaitGroup, fileSizes chan<- int64) {
 	defer n.Done()
+	if cancelled() {
+		return
+	}
 	for _, entry := range dirents(dir) {
 		if entry.IsDir() {
 			subDir := filepath.Join(dir, entry.Name())
@@ -82,4 +101,15 @@ func walkDir(dir string, n *sync.WaitGroup, fileSizes chan<- int64) {
 
 func printDiskUsage(nfiles, nbytes int64) {
 	fmt.Printf("%d files %.1f GB\n", nfiles, float64(nbytes)/1e9)
+}
+
+var done = make(chan struct{})
+
+func cancelled() bool {
+	select {
+	case <-done:
+		return true
+	default:
+		return false
+	}
 }
