@@ -16,9 +16,10 @@ func main() {
 	done := make(chan struct{})
 
 	go func() {
-		// Ignoring errors in purpose.
+		// Ignoring errors on purpose.
 		// This blocks.
-		io.Copy(os.Stdout, conn)
+		_, err := io.Copy(os.Stdout, conn)
+		log.Printf("Error: %v", err)
 		log.Println("done")
 		done <- struct{}{}
 	}()

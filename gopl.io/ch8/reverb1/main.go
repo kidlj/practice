@@ -10,11 +10,11 @@ import (
 )
 
 func main() {
-	listener, err := net.Listen("tcp", "localhost:8000")
+	listener, err := net.Listen("tcp", ":8000")
+	log.Println("Listening on :8000")
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -28,14 +28,12 @@ func main() {
 func handleConn(c net.Conn) {
 	input := bufio.NewScanner(c)
 	for input.Scan() {
-		go echo(c, input.Text(), 1*time.Second)
+		echo(c, input.Text(), 1*time.Second)
 	}
-	// NOTE: ignoring potential errors from input.Err()
 	c.Close()
 }
 
 func echo(c net.Conn, shout string, delay time.Duration) {
-	// NOTE: ignoring writing errors
 	fmt.Fprintln(c, "\t", strings.ToUpper(shout))
 	time.Sleep(delay)
 	fmt.Fprintln(c, "\t", shout)
