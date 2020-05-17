@@ -13,3 +13,18 @@ func Example_contains_empty() {
 	// Output:
 	// true
 }
+
+func Example_Split() {
+	var str = "div.comment"
+	s := strings.Split(str, " ")
+	fmt.Println(s)
+	// Output:
+	// [div.comment]
+}
+
+func Example_Replace() {
+	var str = ".cell"
+	fmt.Println(strings.Replace(str, ".", "", 1))
+	// Output:
+	// cell
+}
