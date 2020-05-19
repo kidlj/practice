@@ -28,6 +28,18 @@ func hello(c echo.Context) error {
 	})
 }
 
+func notFound(c echo.Context) error {
+	return echo.NewHTTPError(http.StatusNotFound, "not found")
+}
+
+func serverError(c echo.Context) error {
+	return echo.NewHTTPError(http.StatusInternalServerError, "server error")
+}
+
+func badRequest(c echo.Context) error {
+	return echo.NewHTTPError(http.StatusBadRequest, "bad request")
+}
+
 func main() {
 	e := echo.New()
 
@@ -36,6 +48,9 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
+	e.GET("/400", badRequest)
+	e.GET("/404", notFound)
+	e.GET("/500", serverError)
 	e.GET("/*", hello)
 
 	// Start server
