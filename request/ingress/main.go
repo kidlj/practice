@@ -25,8 +25,9 @@ func main() {
 		resp, err := http.Get(base + url)
 		if err != nil {
 			log.Println(err)
+		} else {
+			log.Printf("getting %s: %s", url, resp.Status)
 		}
-		log.Printf("getting %s: %s", url, resp.Status)
 		resp.Body.Close()
 		time.Sleep(500 * time.Millisecond)
 	}
