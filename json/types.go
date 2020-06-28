@@ -1,4 +1,4 @@
-package main
+package json
 
 import (
 	"encoding/json"
@@ -50,101 +50,118 @@ type Cookie struct {
 	CookieValue string `json:"cookieValue"`
 }
 
-// test json omitempty
-func main() {
-	// user := User{
-	// 	ID: "test",
-	// }
-	// bytes, err := json.Marshal(user)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+type sslConfiguration struct {
+	Certificates map[string]string `json:"certificates"`
+}
 
-	// t := TrafficShapingPolicy{
-	// 	Match: [][]Match{
-	// 		{
-	// 			{
-	// 				Header: Header{
-	// 					Header:      "mellon",
-	// 					HeaderValue: "coolie",
-	// 				},
-	// 			},
-	// 			{
-	// 				Cookie: Cookie{
-	// 					Cookie:      "hello",
-	// 					CookieValue: "world",
-	// 				},
-	// 			},
-	// 			{
-	// 				Header: Header{
-	// 					Header:      "music",
-	// 					HeaderValue: "post-punk",
-	// 				},
-	// 			},
-	// 		},
-	// 		{
-	// 			{
-	// 				Header: Header{
-	// 					Header:      "x-version",
-	// 					HeaderValue: "feature",
-	// 				},
-	// 			},
-	// 			{
-	// 				Cookie: Cookie{
-	// 					Cookie:      "y-cookie",
-	// 					CookieValue: "canary",
-	// 				},
-	// 			},
-	// 		},
-	// 	},
-	// }
-
-	t1 := [][]Match{
-		{
-			{
-				Header: Header{
-					Header:      "mellon",
-					HeaderValue: "coolie",
-				},
-			},
-			{
-				Cookie: Cookie{
-					Cookie:      "hello",
-					CookieValue: "world",
-				},
-			},
-			{
-				Header: Header{
-					Header:      "music",
-					HeaderValue: "post-punk",
-				},
-			},
-		},
-		{
-			{
-				Header: Header{
-					Header:      "x-version",
-					HeaderValue: "feature",
-				},
-			},
-			{
-				Cookie: Cookie{
-					Cookie:      "y-cookie",
-					CookieValue: "canary",
-				},
-			},
-		},
+// configureCertificates JSON encodes certificates and POSTs it to an internal HTTP endpoint
+// that is handled by Lua
+func configureCertificates() string {
+	configuration := &sslConfiguration{
+		Certificates: map[string]string{},
 	}
-
-	bytes, err := json.Marshal(t1)
+	bytes, err := json.Marshal(configuration)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(bytes))
-	t2 := [][]Match{}
-	// t2 := TrafficShapingPolicy{}
-	if err := json.Unmarshal(bytes, &t2); err != nil {
-		fmt.Println(err)
-	}
-	fmt.Printf("%#v\n", t2)
+	return string(bytes)
 }
+
+// test json omitempty
+// func main() {
+// user := User{
+// 	ID: "test",
+// }
+// bytes, err := json.Marshal(user)
+// if err != nil {
+// 	fmt.Println(err)
+// }
+
+// t := TrafficShapingPolicy{
+// 	Match: [][]Match{
+// 		{
+// 			{
+// 				Header: Header{
+// 					Header:      "mellon",
+// 					HeaderValue: "coolie",
+// 				},
+// 			},
+// 			{
+// 				Cookie: Cookie{
+// 					Cookie:      "hello",
+// 					CookieValue: "world",
+// 				},
+// 			},
+// 			{
+// 				Header: Header{
+// 					Header:      "music",
+// 					HeaderValue: "post-punk",
+// 				},
+// 			},
+// 		},
+// 		{
+// 			{
+// 				Header: Header{
+// 					Header:      "x-version",
+// 					HeaderValue: "feature",
+// 				},
+// 			},
+// 			{
+// 				Cookie: Cookie{
+// 					Cookie:      "y-cookie",
+// 					CookieValue: "canary",
+// 				},
+// 			},
+// 		},
+// 	},
+// }
+
+// 	t1 := [][]Match{
+// 		{
+// 			{
+// 				Header: Header{
+// 					Header:      "mellon",
+// 					HeaderValue: "coolie",
+// 				},
+// 			},
+// 			{
+// 				Cookie: Cookie{
+// 					Cookie:      "hello",
+// 					CookieValue: "world",
+// 				},
+// 			},
+// 			{
+// 				Header: Header{
+// 					Header:      "music",
+// 					HeaderValue: "post-punk",
+// 				},
+// 			},
+// 		},
+// 		{
+// 			{
+// 				Header: Header{
+// 					Header:      "x-version",
+// 					HeaderValue: "feature",
+// 				},
+// 			},
+// 			{
+// 				Cookie: Cookie{
+// 					Cookie:      "y-cookie",
+// 					CookieValue: "canary",
+// 				},
+// 			},
+// 		},
+// 	}
+
+// 	bytes, err := json.Marshal(t1)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// 	fmt.Println(string(bytes))
+// 	t2 := [][]Match{}
+// 	// t2 := TrafficShapingPolicy{}
+// 	if err := json.Unmarshal(bytes, &t2); err != nil {
+// 		fmt.Println(err)
+// 	}
+// 	fmt.Printf("%#v\n", t2)
+// }
