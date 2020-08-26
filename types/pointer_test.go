@@ -1,8 +1,9 @@
 package types
 
-import "fmt"
-
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 func Example_Pointer_Equal() {
 	var a *int
@@ -21,5 +22,17 @@ func Example_Pointer_Equal() {
 	// true
 	// true
 	// true
+	// false
+}
+
+func Example_nil() {
+	var a = new(int)
+	fmt.Println(*a)
+	fmt.Println(a == nil)
+	var b *int
+	// panic !!!
+	*b = 3
+	// Output:
+	// 0
 	// false
 }
