@@ -1,7 +1,5 @@
-#include "test.h"
 #include <stdio.h>
-
-typedef struct s t;
+#include "t.h"
 
 int main(void)
 {
