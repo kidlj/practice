@@ -9,35 +9,28 @@ import (
 )
 
 // Handler
-func hello(c echo.Context) error {
-	version := os.Getenv("VERSION")
-	hostname, err := os.Hostname()
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "get hostname error")
+func handler(code int) func(echo.Context) error {
+	return func(c echo.Context) error {
+		version := os.Getenv("VERSION")
+		if version == "" {
+			version = "unknown"
+		}
+		hostname, err := os.Hostname()
+		if err != nil {
+			hostname = "unknown"
+		}
+
+		r := c.Request()
+
+		return c.JSON(code, echo.Map{
+			"scheme":   c.Scheme(),
+			"host":     r.Host,
+			"url":      r.URL.Path,
+			"realIP":   c.RealIP(),
+			"version":  version,
+			"hostname": hostname,
+		})
 	}
-
-	r := c.Request()
-
-	return c.JSON(http.StatusOK, echo.Map{
-		"scheme":   c.Scheme(),
-		"host":     r.Host,
-		"url":      r.URL.Path,
-		"realIP":   c.RealIP(),
-		"version":  version,
-		"hostname": hostname,
-	})
-}
-
-func notFound(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusNotFound, "not found")
-}
-
-func serverError(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusInternalServerError, "server error")
-}
-
-func badRequest(c echo.Context) error {
-	return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 }
 
 func main() {
@@ -48,11 +41,11 @@ func main() {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/400", badRequest)
-	e.GET("/404", notFound)
-	e.GET("/500", serverError)
-	e.GET("/*", hello)
+	e.GET("/400", handler(http.StatusBadRequest))
+	e.GET("/404", handler(http.StatusNotFound))
+	e.GET("/500", handler(http.StatusInternalServerError))
+	e.GET("/*", handler(http.StatusOK))
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8082"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
