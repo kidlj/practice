@@ -1,6 +1,10 @@
 package regex
 
-import "testing"
+import (
+	"fmt"
+	"regexp"
+	"testing"
+)
 
 func TestValidNginxSize(t *testing.T) {
 	sizes := []string{
@@ -59,5 +63,14 @@ func TestValidHeaderName(t *testing.T) {
 			t.Errorf("test failed for %s", h)
 		}
 	}
+
+}
+
+func Example_Capture() {
+	re := regexp.MustCompile("\\[(.+)\\]")
+	s := re.FindStringSubmatch("美 ['meta.phor]")
+	fmt.Printf("%v\n", s[1])
+	// Output:
+	// 'meta.phor
 
 }
