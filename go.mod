@@ -20,7 +20,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/valyala/fasttemplate v1.0.1 // indirect
-	golang.org/dl v0.0.0-20210220033039-562909534da3 // indirect
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4 // indirect
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 	golang.org/x/text v0.3.2 // indirect
