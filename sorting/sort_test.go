@@ -1,6 +1,8 @@
 package sorting
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func ExampleHeapsort() {
 	a := []int{3, 4, 7, 9, 2, 6, 5, 8, 1, 0}

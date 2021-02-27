@@ -18,7 +18,10 @@ func Example_Split() {
 	var str = "div.comment"
 	s := strings.Split(str, " ")
 	fmt.Println(s)
+	s = strings.Split(str, "或")
+	fmt.Println(s)
 	// Output:
+	// [div.comment]
 	// [div.comment]
 }
 
