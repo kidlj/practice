@@ -3,7 +3,7 @@ package lists
 import (
 	"fmt"
 
-	"github.com/kidlj/demo/containers"
+	"github.com/kidlj/demo/go/containers"
 )
 
 type node struct {

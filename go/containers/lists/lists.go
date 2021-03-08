@@ -1,6 +1,6 @@
 package lists
 
-import "github.com/kidlj/demo/containers"
+import "github.com/kidlj/demo/go/containers"
 
 // List is the interface for lists in the container hierarchy.
 type List interface {

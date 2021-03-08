@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kidlj/demo/containers"
+	"github.com/kidlj/demo/go/containers"
 )
 
 func ExampleArrayList_Insert() {
