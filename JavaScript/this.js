@@ -19,7 +19,11 @@ f() // print undefined
 
 // 箭头函数
 let o = {
-    color: "blue"
+    color: "blue",
+    // 作为对象的方法，没有 this 绑定
+    sayColorArrow: () => {
+        console.log(this.color)
+    }
 }
 
 let sayColor = () => {
@@ -28,6 +32,10 @@ let sayColor = () => {
 sayColor() // undefined
 o.sayColor = sayColor
 o.sayColor() // undefined
+
+o.sayColorArrow() // undefined
+let sayColorArrow = o.sayColorArrow
+sayColorArrow() // undefined
 
 // 函数表达式
 let b = {
