@@ -74,3 +74,11 @@ func Example_Capture() {
 	// 'meta.phor
 
 }
+
+func TestPhoneNumber(t *testing.T) {
+	phone := "+8618511077671"
+	validPhone := regexp.MustCompile(`^(\+86)?1[3-9]\d{9}$`)
+	if ok := validPhone.MatchString(phone); !ok {
+		t.Error()
+	}
+}
