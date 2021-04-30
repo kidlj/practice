@@ -15,7 +15,7 @@ func Example_configureCertificates() {
 func Example_Pointer() {
 	type T struct {
 		I *int   `json:"i,omitempty"`
-		S string `json:"s,omitemtpy"`
+		S string `json:"s,omitempty"`
 	}
 	j := `
 	{
@@ -31,4 +31,18 @@ func Example_Pointer() {
 	fmt.Println(string(bytes))
 	// Output:
 	// {}
+}
+
+func Example_Map() {
+	m := map[string]struct{}{
+		"a": {},
+		"b": {},
+	}
+	b, err := json.Marshal(m)
+	if err != nil {
+		fmt.Print(err)
+	}
+	fmt.Printf("%q\n", b)
+	// Output:
+	// "{\"a\":{},\"b\":{}}"
 }
