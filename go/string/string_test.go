@@ -26,8 +26,11 @@ func Example_Split() {
 }
 
 func Example_Replace() {
-	var str = ".cell"
-	fmt.Println(strings.Replace(str, ".", "", 1))
+	var str = "Avoiding Memory Leak in\n\t\t\t\t\tGolang API"
+	str = strings.ReplaceAll(str, "\n", " ")
+	str = strings.ReplaceAll(str, "\t", "")
+	str = strings.ReplaceAll(str, "\r", "")
+	fmt.Println(str)
 	// Output:
-	// cell
+	// Avoiding Memory Leak in Golang API
 }
