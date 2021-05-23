@@ -1,3 +1,3 @@
 ### About
 
-Go exercises, experiments and demos.
+Language exercises, experiments and demos.
