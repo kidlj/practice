@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"testing"
 )
 
 func Example_configureCertificates() {
@@ -45,4 +46,27 @@ func Example_Map() {
 	fmt.Printf("%q\n", b)
 	// Output:
 	// "{\"a\":{},\"b\":{}}"
+}
+
+// omitempty has no effect on unmarshalling.
+func Test_omitempty(t *testing.T) {
+	type S struct {
+		Payload struct {
+			Op    string `json:"op"`
+			After struct {
+				ID int `json:"id"`
+			} `json:"after"`
+		} `json:"payload"`
+	}
+
+	var s = new(S)
+
+	data := `{ "payload":{"op": "d"}}`
+	err := json.Unmarshal([]byte(data), s)
+	if err != nil {
+		t.Error("unmarshall failed")
+	}
+	if s.Payload.Op != "d" {
+		t.Error("test failed")
+	}
 }
