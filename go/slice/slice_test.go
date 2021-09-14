@@ -137,7 +137,6 @@ func ExampleIndex() {
 	fmt.Println(a[0:])
 	fmt.Println(b[1:])
 	fmt.Println(c[0:])
-	// fmt.Println(a[1:]) // panic: runtime error: slice bounds out of range
 	// Output:
 	// false
 	// true
