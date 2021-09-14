@@ -70,3 +70,36 @@ func Test_omitempty(t *testing.T) {
 		t.Error("test failed")
 	}
 }
+
+func Test_recursion(t *testing.T) {
+	type Node struct {
+		Name        string  `json:"name"`
+		Def         string  `json:"def"`
+		Reflections []*Node `json:"reflections"`
+	}
+
+	s := &Node{
+		Name: "wind",
+		Def:  "the wind, you knonw",
+		Reflections: []*Node{
+			{
+				Name: "wound",
+				Def:  "wounded",
+			},
+		},
+	}
+
+	b, err := json.Marshal(s)
+	if err != nil {
+		t.Error(err)
+	}
+
+	back := new(Node)
+	err = json.Unmarshal(b, back)
+	if err != nil {
+		t.Error(err)
+	}
+	if back.Name != "wind" || back.Reflections[0].Name != "wound" {
+		t.Error("failed")
+	}
+}
