@@ -154,3 +154,13 @@ func ExampleSliceCap() {
 	// 3
 	// 3
 }
+
+func Example_Array() {
+	a := []int{1, 2, 3}
+	b := append(a, 4)
+	fmt.Println(a)
+	fmt.Println(b)
+	// Output:
+	// [1 2 3]
+	// [1 2 3 4]
+}

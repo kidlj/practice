@@ -29,6 +29,7 @@ func handler(code int) func(echo.Context) error {
 			"realIP":   c.RealIP(),
 			"version":  version,
 			"hostname": hostname,
+			"headers":  c.Request().Header,
 		})
 	}
 }
@@ -47,5 +48,5 @@ func main() {
 	e.GET("/*", handler(http.StatusOK))
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":9090"))
 }
