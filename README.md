@@ -1,3 +1,3 @@
 ### About
 
-Language exercises, experiments and demos.
+Programming exercises, experiments and demos.

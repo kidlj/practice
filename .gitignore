@@ -13,10 +13,4 @@
 
 vendor
 
-echo-demo
-echo-default-backend
-echo-demo-8080
-echo-demo-8081
-echo-demo-8082
-
 .DS_Store

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kidlj/demo/go/crawler/links"
+	"github.com/kidlj/playground/go/crawler/links"
 )
 
 // CONCURRENCY sets the concurrency level
