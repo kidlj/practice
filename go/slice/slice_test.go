@@ -19,10 +19,6 @@ func ExampleSliceAppend() {
 	// [1]
 	// [1] ✗
 
-	// Output:
-	// [1]
-	// []
-
 	// Javascript array:
 	// a = [1, 2, 3]
 	// b = a
@@ -33,6 +29,10 @@ func ExampleSliceAppend() {
 	// Javascript Output:
 	// [1, 2, 3, 4]
 	// [1, 2, 3, 4]
+
+	// Output:
+	// [1]
+	// []
 }
 
 func ExampleSliceAppendSlice() {
@@ -93,7 +93,7 @@ func ExampleReverse() {
 }
 
 func ExampleRotate() {
-	// Roteate s left by two positions.
+	// Rotate s left by two positions.
 	s := []int{0, 1, 2, 3, 4}
 	reverse(s[:2])
 	reverse(s[2:])

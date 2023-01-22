@@ -3,7 +3,7 @@ package lists
 import (
 	"fmt"
 
-	"github.com/kidlj/demo/go/containers"
+	"github.com/kidlj/playground/go/containers"
 )
 
 // ArrayList is a contiguous implementation of a list.
@@ -25,6 +25,7 @@ func (list *ArrayList) IsEmpty() bool {
 // Clear clears the list.
 func (list *ArrayList) Clear() {
 	list.store = nil
+	list.count = 0
 }
 
 // Insert adds an element in the i index.
@@ -62,7 +63,7 @@ func (list *ArrayList) Get(i int) (interface{}, error) {
 // Put changes element i.
 func (list *ArrayList) Put(i int, e interface{}) error {
 	if i < 0 || i >= list.count {
-		return fmt.Errorf("Get: index out of bounds: %d", i)
+		return fmt.Errorf("Put: index out of bounds: %d", i)
 	}
 	list.store[i] = e
 	return nil

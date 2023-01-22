@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kidlj/demo/go/containers"
+	"github.com/kidlj/playground/go/containers"
 )
 
 func ExampleArrayList_Insert() {
 	var list ArrayList
-	list.Insert(0, "a")
+	_ = list.Insert(0, "a")
 	fmt.Println(list.Size())
 	// Output:
 	// 1
@@ -17,8 +17,8 @@ func ExampleArrayList_Insert() {
 
 func ExampleArrayList_Delete() {
 	var list ArrayList
-	list.Insert(0, "a")
-	list.Delete(0)
+	_ = list.Insert(0, "a")
+	_, _ = list.Delete(0)
 	fmt.Println(list.Size())
 	// Output:
 	// 0
@@ -27,6 +27,7 @@ func ExampleArrayList_Delete() {
 func TestLists(t *testing.T) {
 	testList(t, new(ArrayList), "ArrayList ")
 	testList(t, new(LinkedList), "LinkedList ")
+	testList(t, new(DoublyLinkedList), "DoublyLinkedList ")
 }
 
 func testList(t *testing.T, list List, name string) {
@@ -281,4 +282,24 @@ func testList(t *testing.T, list List, name string) {
 	if !list.IsEmpty() || 0 != list.Size() {
 		t.Error(name + "should be empty and size should be 0 after clear is called")
 	}
+}
+
+func ExampleLinkedList_printLots() {
+	// 0 1 2 3 4
+	list := new(LinkedList)
+	_ = list.Insert(0, 3)
+	_ = list.Insert(0, 1)
+	_ = list.Insert(2, 4)
+	_ = list.Insert(1, 2)
+	_ = list.Insert(0, 0)
+
+	// 2 3 5
+	seqList := new(LinkedList)
+	_ = seqList.Insert(0, 5)
+	_ = seqList.Insert(0, 3)
+	_ = seqList.Insert(0, 2)
+
+	list.printLots(seqList)
+	// Output:
+	// 1 2 4
 }

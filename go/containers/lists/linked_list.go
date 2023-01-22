@@ -3,215 +3,206 @@ package lists
 import (
 	"fmt"
 
-	"github.com/kidlj/demo/go/containers"
+	"github.com/kidlj/playground/go/containers"
 )
 
 type node struct {
-	item interface{}
-	pred *node
+	item any
 	succ *node
 }
 
-// linkedListIterator is the data structure for a LinkedList external iterator.
-type linkedListIterator struct {
+type LinkedList struct {
+	head        *node
+	cursorIndex int
+	cursorPtr   *node
+	count       int
+}
+
+type LinkedListIterator struct {
 	list    *LinkedList
 	current *node
 }
 
-// LinkedList is a double-linked implementation of a list
-type LinkedList struct {
-	cursorIndex int
-	cursorPtr   *node
-	head        *node
-	count       int
-}
-
-func (list *LinkedList) init() {
-	if list.head == nil {
-		dummy := &node{item: 0}
-		dummy.pred, dummy.succ = dummy, dummy
-		list.cursorIndex = -1
-		list.cursorPtr, list.head = dummy, dummy
+func (l *LinkedList) init() {
+	if l.head == nil {
+		dummy := &node{}
+		dummy.succ = dummy
+		l.head = dummy
+		l.cursorPtr = dummy
+		l.cursorIndex = -1
+		l.count = 0
 	}
 }
 
-func (list *LinkedList) setCursor(index int) {
-	if index <= list.count/2 {
-		// compare the distance of target index between head and between current cursorIndex
-		if index+1 < list.cursorIndex-index {
-			list.cursorIndex = -1
-			list.cursorPtr = list.head
-		}
-	} else {
-		// compare the distance of target index between tail and between current cursorIndex
-		if list.count-index < index-list.cursorIndex {
-			list.cursorIndex = list.count
-			list.cursorPtr = list.head
-		}
+func (l *LinkedList) setCursor(i int) {
+	if l.cursorIndex >= i {
+		l.cursorIndex = -1
+		l.cursorPtr = l.head
 	}
-	for list.cursorIndex < index {
-		list.cursorIndex++
-		list.cursorPtr = list.cursorPtr.succ
-	}
-	for index < list.cursorIndex {
-		list.cursorIndex--
-		list.cursorPtr = list.cursorPtr.pred
+
+	for l.cursorIndex < i-1 {
+		l.cursorIndex++
+		l.cursorPtr = l.cursorPtr.succ
 	}
 }
 
-// Size indicates how many elements are in the list.
-func (list *LinkedList) Size() int {
-	return list.count
+func (l *LinkedList) Size() int {
+	return l.count
 }
 
-// IsEmpty determines if the list is empty.
-func (list *LinkedList) IsEmpty() bool {
-	return list.count == 0
+func (l *LinkedList) IsEmpty() bool {
+	return l.count == 0
 }
 
-// Clear remove all elements from the list.
-func (list *LinkedList) Clear() {
-	list.count = 0
-	list.head = nil
-	list.init()
+func (l *LinkedList) Clear() {
+	l.count = 0
+	l.head = nil
+	l.init()
 }
 
-// Contains determines wheter e is in the list.
-func (list *LinkedList) Contains(e interface{}) bool {
-	list.init()
-	for ptr := list.head.succ; ptr != list.head; ptr = ptr.succ {
-		if ptr.item == e {
+func (l *LinkedList) Insert(i int, e any) error {
+	if i < 0 || i > l.count {
+		return fmt.Errorf("Insert: index out of bounds: %d", i)
+	}
+	l.init()
+	l.setCursor(i)
+	n := &node{item: e, succ: l.cursorPtr.succ}
+	l.cursorPtr.succ = n
+	l.count++
+	return nil
+}
+
+func (l *LinkedList) Get(i int) (any, error) {
+	if i < 0 || i >= l.count {
+		return nil, fmt.Errorf("Get: Index out of bounds: %d", i)
+	}
+	l.setCursor(i)
+	return l.cursorPtr.succ.item, nil
+}
+
+func (l *LinkedList) Append(e any) {
+	l.init()
+	l.Insert(l.count, e)
+}
+
+func (l *LinkedList) Put(i int, e any) error {
+	if i < 0 || i >= l.count {
+		return fmt.Errorf("Put: index out of bounds: %d", i)
+	}
+
+	l.init()
+	l.setCursor(i)
+	l.cursorPtr.succ.item = e
+	return nil
+}
+
+func (l *LinkedList) Delete(i int) (any, error) {
+	if i < 0 || i >= l.count {
+		return nil, fmt.Errorf("Delete: index out of bounds: %d", i)
+	}
+
+	l.init()
+	l.setCursor(i)
+	result := l.cursorPtr.succ.item
+	l.cursorPtr.succ = l.cursorPtr.succ.succ
+	l.count--
+	return result, nil
+}
+
+func (l *LinkedList) Slice(i, j int) (List, error) {
+	if i < 0 || i > j || j > l.count {
+		return nil, fmt.Errorf("Slice: index out of bounds: %d,%d", i, j)
+	}
+
+	result := new(LinkedList)
+
+	for ; i < j; i++ {
+		e, _ := l.Get(i)
+		result.Append(e)
+	}
+
+	return result, nil
+}
+
+func (l *LinkedList) Contains(e any) bool {
+	l.init()
+	for n := l.head.succ; n != l.head; n = n.succ {
+		if n.item == e {
 			return true
 		}
 	}
+
 	return false
 }
 
-// Insert puts element e into the list at location i.
-func (list *LinkedList) Insert(i int, e interface{}) error {
-	if i < 0 || i > list.count {
-		return fmt.Errorf("Insert: index out of bounds: %d", i)
-	}
-	list.init()
-	list.setCursor(i)
-	node := &node{e, list.cursorPtr.pred, list.cursorPtr}
-	list.cursorPtr.pred.succ = node
-	list.cursorPtr.pred = node
-	list.cursorPtr = node
-	list.count++
-	return nil
-}
-
-// Delete removes and returns the element at location i.
-func (list *LinkedList) Delete(i int) (interface{}, error) {
-	if i < 0 || i >= list.count {
-		return nil, fmt.Errorf("Delete: index out of bounds: %d", i)
-	}
-	// list.init()
-	list.setCursor(i)
-	result := list.cursorPtr.item
-	list.cursorPtr.pred.succ = list.cursorPtr.succ
-	list.cursorPtr.succ.pred = list.cursorPtr.pred
-	list.cursorPtr = list.cursorPtr.succ
-	list.count--
-	return result, nil
-}
-
-// Get returns the element at location i.
-func (list *LinkedList) Get(i int) (interface{}, error) {
-	if i < 0 || i >= list.count {
-		return nil, fmt.Errorf("Get: index out of bounds: %d", i)
-	}
-	list.setCursor(i)
-	return list.cursorPtr.item, nil
-}
-
-// Put changes element i.
-func (list *LinkedList) Put(i int, e interface{}) error {
-	if i < 0 || i >= list.count {
-		return fmt.Errorf("Get: index out of bounds: %d", i)
-	}
-	list.setCursor(i)
-	list.cursorPtr.item = e
-	return nil
-}
-
-// Index returns the location of e.
-// If e is not present, return -1 and false, otherwise return the location and true.
-func (list *LinkedList) Index(e interface{}) (int, bool) {
-	list.init()
-	for ptr, i := list.head.succ, 0; ptr != list.head; ptr, i = ptr.succ, i+1 {
-		if ptr.item == e {
+func (l *LinkedList) Index(e any) (int, bool) {
+	for n, i := l.head.succ, 0; n != l.head; n, i = n.succ, i+1 {
+		if n.item == e {
 			return i, true
 		}
 	}
+
 	return -1, false
 }
 
-// Slice makes a new list duplicating part of the list.
-func (list *LinkedList) Slice(i, j int) (List, error) {
-	if i < 0 || i > j || j > list.count {
-		return nil, fmt.Errorf("Slice: illegal indecies: %d, %d", i, j)
-	}
-	result := new(LinkedList)
-	result.init()
-	for srcIndex, dstIndex := i, 0; srcIndex < j; srcIndex, dstIndex = srcIndex+1, dstIndex+1 {
-		v, _ := list.Get(srcIndex)
-		result.Insert(dstIndex, v)
-	}
-	return result, nil
-}
-
-// Equal indicates whether another List is identical to this one.
-// Two Lists are identical if they are the same size and have the same
-// elements in the same order.
-// Precondition: element can be compared using ==.
-// Precondition violation: panic.
-func (list *LinkedList) Equal(l List) bool {
-	if list.count != l.Size() {
+func (l *LinkedList) Equal(list List) bool {
+	if l.count != list.Size() {
 		return false
 	}
-	iter := l.NewIterator()
+
+	iter := list.NewIterator()
 	v, ok := iter.Next()
-	for ptr := list.head.succ; ptr != list.head; ptr = ptr.succ {
-		if !ok || v != ptr.item {
+	for n := l.head.succ; n != l.head; n = n.succ {
+		if !ok || n.item != v {
 			return false
 		}
 		v, ok = iter.Next()
 	}
+
 	return true
 }
 
-// NewIterator returns an external iterator.
-func (list *LinkedList) NewIterator() containers.Iterator {
-	list.init()
-	return &linkedListIterator{list, list.head.succ}
-}
-
-// Apply calls function f on every element in the list.
-func (list *LinkedList) Apply(f func(e interface{})) {
-	list.init()
-	for ptr := list.head.succ; ptr != list.head; ptr = ptr.succ {
-		f(ptr.item)
+func (l *LinkedList) Apply(f func(e any)) {
+	l.init()
+	for n := l.head.succ; n != l.head; n = n.succ {
+		f(n.item)
 	}
 }
 
-// Done indicates whether the iteration is complete.
-func (iter *linkedListIterator) Done() bool {
-	return iter.current == iter.list.head
+func (l *LinkedList) NewIterator() containers.Iterator {
+	l.init()
+	return &LinkedListIterator{list: l, current: l.head.succ}
 }
 
-// Reset prepares an iterator o traverse its associated Collection.
-func (iter *linkedListIterator) Reset() {
-	iter.current = iter.list.head.succ
-}
-
-// Next returns an element and an indication of whether iteration is in process.
-func (iter *linkedListIterator) Next() (interface{}, bool) {
+func (iter *LinkedListIterator) Next() (any, bool) {
 	if iter.current == iter.list.head {
 		return nil, false
 	}
+
 	result := iter.current.item
 	iter.current = iter.current.succ
 	return result, true
+}
+
+func (iter *LinkedListIterator) Reset() {
+	iter.current = iter.list.head.succ
+}
+
+func (iter *LinkedListIterator) Done() bool {
+	return iter.current == iter.list.head
+}
+
+func (l *LinkedList) printLots(seqList List) {
+	iter := seqList.NewIterator()
+	v, ok := iter.Next()
+	n := l.head.succ
+	seq := 1
+	for n != l.head && ok {
+		if seq == v {
+			fmt.Printf("%v ", n.item)
+			v, ok = iter.Next()
+		}
+		seq++
+		n = n.succ
+	}
 }
