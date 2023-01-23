@@ -3,7 +3,7 @@ package lists
 import (
 	"fmt"
 
-	"github.com/kidlj/playground/go/containers"
+	"github.com/kidlj/practice/go/containers"
 )
 
 // ArrayList is a contiguous implementation of a list.

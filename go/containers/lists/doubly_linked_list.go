@@ -3,7 +3,7 @@ package lists
 import (
 	"fmt"
 
-	"github.com/kidlj/playground/go/containers"
+	"github.com/kidlj/practice/go/containers"
 )
 
 type doublyLinkedListNode struct {

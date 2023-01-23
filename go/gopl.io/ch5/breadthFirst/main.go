@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kidlj/playground/go/gopl.io/ch5/links"
+	"github.com/kidlj/practice/go/gopl.io/ch5/links"
 )
 
 func main() {

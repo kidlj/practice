@@ -3,7 +3,7 @@ package stacks
 import (
 	"fmt"
 
-	"github.com/kidlj/playground/go/containers/lists"
+	"github.com/kidlj/practice/go/containers/lists"
 )
 
 type LinkedListStack struct {

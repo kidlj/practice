@@ -1,6 +1,6 @@
 package stacks
 
-import "github.com/kidlj/playground/go/containers"
+import "github.com/kidlj/practice/go/containers"
 
 type Stack interface {
 	containers.Container
