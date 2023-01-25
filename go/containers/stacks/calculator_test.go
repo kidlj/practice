@@ -4,7 +4,12 @@ import (
 	"testing"
 )
 
-func TestCal_Cal(t *testing.T) {
+func TestCalulator(t *testing.T) {
+	testCalulator(t, new(Calc))
+	testCalulator(t, new(ExpressionTreeCalculator))
+}
+
+func testCalulator(t *testing.T, cal Calculator) {
 	cases := []struct {
 		s       string
 		result  float64
@@ -47,6 +52,10 @@ func TestCal_Cal(t *testing.T) {
 			result: 70,
 		},
 		{
+			s:      "  35  2    *",
+			result: 70,
+		},
+		{
 			s:       "4 4 4",
 			errored: true,
 		},
@@ -64,16 +73,17 @@ func TestCal_Cal(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		cal := new(Calc)
-		n, err := cal.Cal(c.s)
+		n, err := cal.Evaluate(c.s)
 		if err != nil {
 			if !c.errored {
 				t.Errorf("expression should error: %s", c.s)
 			}
+			cal.Reset()
 			continue
 		}
 		if n != c.result {
-			t.Errorf("expression: %s, expected: %f, got %f", c.s, c.result, n)
+			t.Errorf("expression evaluation error: %s, expected: %f, got %f", c.s, c.result, n)
 		}
+		cal.Reset()
 	}
 }

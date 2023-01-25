@@ -16,7 +16,6 @@ func (c *Calc) pop() (float64, error) {
 	result := c.stack[len(c.stack)-1]
 	c.stack = c.stack[:len(c.stack)-1]
 	return result, nil
-
 }
 
 func (c *Calc) push(n float64) {
@@ -27,7 +26,7 @@ func (c *Calc) size() int {
 	return len(c.stack)
 }
 
-func (c *Calc) getOP(s string, i int) (string, int) {
+func getOP(s string, i int) (string, int) {
 	for ; i < len(s) && isSpace(s[i]); i++ {
 		continue
 	}
@@ -52,11 +51,11 @@ func (c *Calc) getOP(s string, i int) (string, int) {
 
 var syntaxErr = fmt.Errorf("bad syntax")
 
-func (c *Calc) Cal(s string) (float64, error) {
+func (c *Calc) Evaluate(s string) (float64, error) {
 	i := 0
 	for i < len(s) {
 		op := ""
-		op, i = c.getOP(s, i)
+		op, i = getOP(s, i)
 		switch op {
 		case "+":
 			op1, err := c.pop()
@@ -119,6 +118,10 @@ func (c *Calc) Cal(s string) (float64, error) {
 	}
 
 	return result, nil
+}
+
+func (c *Calc) Reset() {
+	c.stack = nil
 }
 
 func isDigit(c byte) bool {
