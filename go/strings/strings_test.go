@@ -1,7 +1,8 @@
-package string
+package strings
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -33,4 +34,13 @@ func Example_Replace() {
 	fmt.Println(str)
 	// Output:
 	// Avoiding Memory Leak in Golang API
+}
+
+func Example_Atoi() {
+	s := " 345"
+	i, err := strconv.Atoi(s)
+	fmt.Println(i)
+	fmt.Println(err)
+	// Output:
+	// 345
 }
