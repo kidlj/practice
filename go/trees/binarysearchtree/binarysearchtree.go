@@ -15,6 +15,27 @@ func (t *BinarySearchTree) Size() int {
 	return t.size
 }
 
+func (t *BinarySearchTree) Height() int {
+	return t.height(t.root)
+}
+
+func (t *BinarySearchTree) height(n *node) int {
+	if n == nil {
+		return -1
+	}
+	left := t.height(n.left)
+	right := t.height(n.right)
+
+	return max(left, right) + 1
+}
+
+func max(a, b int) int {
+	if a >= b {
+		return a
+	}
+	return b
+}
+
 func (t *BinarySearchTree) Find(v int) *node {
 	return t.find(t.root, v)
 }

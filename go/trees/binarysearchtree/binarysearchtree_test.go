@@ -32,7 +32,10 @@ func initTree() *BinarySearchTree {
 func TestBinarySearchTree_Insert(t *testing.T) {
 	tr := initTree()
 	if tr.Size() != 8 {
-		t.Errorf("Expected tree size == 8, got %d", tr.Size())
+		t.Errorf("Expecte tree size == 8, got %d", tr.Size())
+	}
+	if tr.Height() != 3 {
+		t.Errorf("Expect tree size == 3, got %d", tr.Height())
 	}
 	tr.Insert(3)
 	if tr.Size() != 8 {
@@ -50,13 +53,22 @@ func TestBinarySearchTree_Delete(t *testing.T) {
 	if tr.Size() != 7 {
 		t.Errorf("delete an existing element should decrease tree size by 1")
 	}
+	if tr.Height() != 3 {
+		t.Errorf("Expect tree size == 3, got %d", tr.Height())
+	}
 	tr.Delete(2)
 	if tr.Size() != 6 {
 		t.Errorf("delete an existing element should decrease tree size by 1")
 	}
+	if tr.Height() != 2 {
+		t.Errorf("Expect tree size == 2, got %d", tr.Height())
+	}
 	tr.Delete(1)
 	if tr.Size() != 5 {
 		t.Errorf("delete an existing element should decrease tree size by 1")
+	}
+	if tr.Height() != 2 {
+		t.Errorf("Expect tree size == 2, got %d", tr.Height())
 	}
 }
 
