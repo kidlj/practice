@@ -107,10 +107,8 @@ func ExampleBinarySearchTree_VisitPreOrder() {
 func ExampleBinarySearchTree_NewInOrderIterator() {
 	tr := initTree()
 	iter := tr.NewInOrderIterator()
-	v, ok := iter.Next()
-	for ok {
+	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
 		fmt.Printf("%d ", v)
-		v, ok = iter.Next()
 	}
 	fmt.Printf("%v", iter.Done())
 	// Output:
@@ -120,10 +118,8 @@ func ExampleBinarySearchTree_NewInOrderIterator() {
 func ExampleBinarySearchTree_NewPreOrderIterator() {
 	tr := initTree()
 	iter := tr.NewPreOrderIterator()
-	v, ok := iter.Next()
-	for ok {
+	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
 		fmt.Printf("%d ", v)
-		v, ok = iter.Next()
 	}
 	fmt.Printf("%v", iter.Done())
 	// Output:
@@ -133,10 +129,9 @@ func ExampleBinarySearchTree_NewPreOrderIterator() {
 func ExampleBinarySearchTree_NewDepthOrderIterator() {
 	tr := initTree()
 	iter := tr.NewDepthOrderIterator()
-	v, ok := iter.Next()
-	for ok {
+	for v, ok := iter.Next(); ok; v, ok = iter.Next() {
 		fmt.Printf("%d ", v)
-		v, ok = iter.Next()
+
 	}
 	fmt.Printf("%v", iter.Done())
 	// Output:
