@@ -9,7 +9,7 @@ func Example_Itoa() {
 	port := 9014
 	s := strconv.Itoa(port)
 	fmt.Println(s)
-	fmt.Println(string(port))
+	fmt.Println(port)
 	// Output:
 	// 9014
 	// 9014

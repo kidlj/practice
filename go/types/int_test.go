@@ -16,3 +16,17 @@ func Example_Int() {
 	// 0
 	// -1
 }
+
+func ExampleIntDivision() {
+	fmt.Println(-1 / 1)
+	fmt.Println(-1 / 2)
+	fmt.Println(-1 / -2)
+	fmt.Println(-2 / 4)
+	fmt.Println(-10 / 2)
+	// Output:
+	// -1
+	// 0
+	// 0
+	// 0
+	// -5
+}
