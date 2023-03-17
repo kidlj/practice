@@ -26,7 +26,7 @@ func ExampleArrayList_Delete() {
 
 func TestLists(t *testing.T) {
 	testList(t, new(ArrayList), "ArrayList ")
-	testList(t, new(LinkedList), "LinkedList ")
+	testList(t, NewLinkedList(), "LinkedList ")
 	testList(t, new(DoublyLinkedList), "DoublyLinkedList ")
 }
 

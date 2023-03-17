@@ -23,6 +23,12 @@ type LinkedListIterator struct {
 	current *node
 }
 
+func NewLinkedList() *LinkedList {
+	l := new(LinkedList)
+	l.init()
+	return l
+}
+
 func (l *LinkedList) init() {
 	if l.head == nil {
 		dummy := &node{}
@@ -57,14 +63,12 @@ func (l *LinkedList) IsEmpty() bool {
 func (l *LinkedList) Clear() {
 	l.count = 0
 	l.head = nil
-	l.init()
 }
 
 func (l *LinkedList) Insert(i int, e any) error {
 	if i < 0 || i > l.count {
 		return fmt.Errorf("Insert: index out of bounds: %d", i)
 	}
-	l.init()
 	l.setCursor(i)
 	n := &node{item: e, succ: l.cursorPtr.succ}
 	l.cursorPtr.succ = n
@@ -81,7 +85,6 @@ func (l *LinkedList) Get(i int) (any, error) {
 }
 
 func (l *LinkedList) Append(e any) {
-	l.init()
 	l.Insert(l.count, e)
 }
 
@@ -90,7 +93,6 @@ func (l *LinkedList) Put(i int, e any) error {
 		return fmt.Errorf("Put: index out of bounds: %d", i)
 	}
 
-	l.init()
 	l.setCursor(i)
 	l.cursorPtr.succ.item = e
 	return nil
@@ -101,7 +103,6 @@ func (l *LinkedList) Delete(i int) (any, error) {
 		return nil, fmt.Errorf("Delete: index out of bounds: %d", i)
 	}
 
-	l.init()
 	l.setCursor(i)
 	result := l.cursorPtr.succ.item
 	l.cursorPtr.succ = l.cursorPtr.succ.succ
@@ -114,7 +115,7 @@ func (l *LinkedList) Slice(i, j int) (List, error) {
 		return nil, fmt.Errorf("Slice: index out of bounds: %d,%d", i, j)
 	}
 
-	result := new(LinkedList)
+	result := NewLinkedList()
 
 	for ; i < j; i++ {
 		e, _ := l.Get(i)
@@ -125,7 +126,6 @@ func (l *LinkedList) Slice(i, j int) (List, error) {
 }
 
 func (l *LinkedList) Contains(e any) bool {
-	l.init()
 	for n := l.head.succ; n != l.head; n = n.succ {
 		if n.item == e {
 			return true
@@ -163,14 +163,12 @@ func (l *LinkedList) Equal(list List) bool {
 }
 
 func (l *LinkedList) Apply(f func(e any)) {
-	l.init()
 	for n := l.head.succ; n != l.head; n = n.succ {
 		f(n.item)
 	}
 }
 
 func (l *LinkedList) NewIterator() containers.Iterator {
-	l.init()
 	return &LinkedListIterator{list: l, current: l.head.succ}
 }
 

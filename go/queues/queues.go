@@ -1,12 +1,25 @@
-package queue
+package queues
 
 import "errors"
+
+type Queue interface {
+	IsEmpty() bool
+	Size() int
+	Clear()
+	Enter(any)
+	Leave() (any, error)
+	Front() (any, error)
+}
 
 // ArrayQueue is the array implementation
 type ArrayQueue struct {
 	count      int
 	frontIndex int
 	store      []interface{}
+}
+
+func NewArrayQueue() *ArrayQueue {
+	return new(ArrayQueue)
 }
 
 func (q *ArrayQueue) IsEmpty() bool {
@@ -63,6 +76,10 @@ type LinkedQueue struct {
 type node struct {
 	item interface{}
 	next *node
+}
+
+func NewLinkedQueue() *LinkedQueue {
+	return new(LinkedQueue)
 }
 
 func (q *LinkedQueue) IsEmpty() bool {

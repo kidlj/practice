@@ -1,4 +1,4 @@
-package queue
+package queues
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 
 func ExampleQueue() {
 	// var q ArrayQueue
-	var q LinkedQueue
+	q := NewLinkedQueue()
 	var a []interface{}
 	for i := 0; i < 10; i++ {
 		q.Enter(i)
