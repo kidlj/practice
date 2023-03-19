@@ -137,17 +137,21 @@ func (g *unweightedGraph) DFS(from vertex, visit func(g Graph, e *Edge)) {
 	dfs(g, se)
 }
 
+// O(|V|+|E|)
+// Level order traversal
 func (g *unweightedGraph) BFS(from vertex, visit func(g Graph, e *Edge)) {
 	q := queues.NewLinkedQueue()
 	q.Enter(&Edge{from: vertex(NotAVertex), to: from})
 	visited := make([]bool, g.Vertices())
 	for !q.IsEmpty() {
 		e, _ := q.Leave()
+		// Each vertex is processed at most once.
 		if visited[e.(*Edge).to] {
 			continue
 		}
 		visited[e.(*Edge).to] = true
 		visit(g, e.(*Edge))
+		// Each edge is processed at most once.
 		iter, _ := g.NewIterator(e.(*Edge).to)
 		for e, ok := iter.Next(); ok; e, ok = iter.Next() {
 			q.Enter(e)
@@ -169,6 +173,7 @@ func (g *unweightedGraph) IsPath(from, to vertex) bool {
 	return result
 }
 
+// O(|V|+|E|)
 func (g *unweightedGraph) ShortestPath(from, to vertex) ([]vertex, error) {
 	if !g.IsPath(from, to) {
 		return nil, fmt.Errorf("The vertices are not connected")
