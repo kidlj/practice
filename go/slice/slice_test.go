@@ -49,7 +49,16 @@ func ExampleSliceModify() {
 	b := a
 	fmt.Println(a)
 	fmt.Println(b)
+	// a & b reference the same underlay array
 	a[0] = 0
+	fmt.Println(a)
+	fmt.Println(b)
+	// a & b don't reference the same underlay array anymore
+	a = append(a, 4)
+	fmt.Println(a)
+	fmt.Println(b)
+	a[0] = 1
+	b[0] = -1
 	fmt.Println(a)
 	fmt.Println(b)
 	// Output:
@@ -57,6 +66,10 @@ func ExampleSliceModify() {
 	// [1 2 3]
 	// [0 2 3]
 	// [0 2 3]
+	// [0 2 3 4]
+	// [0 2 3]
+	// [1 2 3 4]
+	// [-1 2 3]
 }
 
 func ExampleArrayIndex() {
