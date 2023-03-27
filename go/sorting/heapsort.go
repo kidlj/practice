@@ -1,34 +1,33 @@
 package sorting
 
-// Heapsort sorts an int array based on heap tree algorithm.
-func Heapsort(a []int) {
-	if len(a) < 2 {
+func HeapSort(s []int) {
+	if len(s) < 2 {
 		return
 	}
-	maxIndex := len(a) - 1
-	for i := (maxIndex - 1) / 2; i >= 0; i-- {
-		siftDown(a, i, maxIndex)
+	for i := len(s) / 2; i >= 0; i-- {
+		percolateDown(s, i, len(s))
 	}
-	for {
-		a[0], a[maxIndex] = a[maxIndex], a[0]
-		maxIndex--
-		if maxIndex <= 0 {
-			return
-		}
-		siftDown(a, 0, maxIndex)
+
+	for i := len(s) - 1; i > 0; i-- {
+		swap(s, 0, i)
+		percolateDown(s, 0, i)
 	}
 }
 
-func siftDown(a []int, i, maxIndex int) {
-	tmp := a[i]
-	for j := 2*i + 1; j <= maxIndex; j = 2*i + 1 {
-		if j < maxIndex && a[j] < a[j+1] {
-			j++
+func percolateDown(s []int, i, n int) {
+	tmp := s[i]
+	for child := leftChild(i); child < n; i, child = child, leftChild(i) {
+		if child != n-1 && s[child] < s[child+1] {
+			child++
 		}
-		if tmp > a[j] {
+		if tmp > s[child] {
 			break
 		}
-		a[i], i = a[j], j
+		s[i] = s[child]
 	}
-	a[i] = tmp
+	s[i] = tmp
+}
+
+func leftChild(i int) int {
+	return 2*i + 1
 }
