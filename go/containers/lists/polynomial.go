@@ -69,16 +69,11 @@ func (l *Polynomial) Multiply(poly *Polynomial) *Polynomial {
 }
 
 func (l *Polynomial) multiply(n1, n2 *PolynomialNode) {
-	exponent := n1.exponent + n2.exponent
-	coefficient := n1.coefficient * n2.coefficient
-	p := l.findPrevious(exponent)
-	if p.succ != nil && p.succ.exponent == exponent {
-		p.succ.coefficient += coefficient
-	} else {
-		// allocate new node to be inserted
-		n := &PolynomialNode{exponent: exponent, coefficient: coefficient, succ: p.succ}
-		p.succ = n
+	n := &PolynomialNode{
+		coefficient: n1.coefficient * n2.coefficient,
+		exponent:    n1.exponent + n2.exponent,
 	}
+	l.Insert(n)
 }
 
 func (l *Polynomial) Print() {
