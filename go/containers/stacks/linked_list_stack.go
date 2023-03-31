@@ -12,7 +12,7 @@ type LinkedListStack struct {
 
 func NewLinkedListStack() *LinkedListStack {
 	s := new(LinkedListStack)
-	s.store = new(lists.LinkedList)
+	s.store = lists.NewLinkedList()
 	return s
 }
 

@@ -6,30 +6,34 @@ import (
 	"github.com/kidlj/practice/go/containers"
 )
 
-// ArrayList is a contiguous implementation of a list.
-type ArrayList struct {
+// arrayList is a contiguous implementation of a list.
+type arrayList struct {
 	store []interface{}
 	count int
 }
 
+func NewArrayList() List {
+	return new(arrayList)
+}
+
 // Size returns the list size.
-func (list *ArrayList) Size() int {
+func (list *arrayList) Size() int {
 	return len(list.store)
 }
 
 // IsEmpty returns if the list is empty.
-func (list *ArrayList) IsEmpty() bool {
+func (list *arrayList) IsEmpty() bool {
 	return len(list.store) == 0
 }
 
 // Clear clears the list.
-func (list *ArrayList) Clear() {
+func (list *arrayList) Clear() {
 	list.store = nil
 	list.count = 0
 }
 
 // Insert adds an element in the i index.
-func (list *ArrayList) Insert(i int, e interface{}) error {
+func (list *arrayList) Insert(i int, e interface{}) error {
 	if i < 0 || i > list.count {
 		return fmt.Errorf("Insert: index out of bounds: %d", i)
 	}
@@ -41,7 +45,7 @@ func (list *ArrayList) Insert(i int, e interface{}) error {
 }
 
 // Delete removes an element in the i index.
-func (list *ArrayList) Delete(i int) (interface{}, error) {
+func (list *arrayList) Delete(i int) (interface{}, error) {
 	if i < 0 || i >= list.count {
 		return nil, fmt.Errorf("Delete: index out of bounds: %d", i)
 	}
@@ -53,7 +57,7 @@ func (list *ArrayList) Delete(i int) (interface{}, error) {
 }
 
 // Get gets the element at index i.
-func (list *ArrayList) Get(i int) (interface{}, error) {
+func (list *arrayList) Get(i int) (interface{}, error) {
 	if i < 0 || i >= list.count {
 		return nil, fmt.Errorf("Get: index out of bounds: %d", i)
 	}
@@ -61,7 +65,7 @@ func (list *ArrayList) Get(i int) (interface{}, error) {
 }
 
 // Put changes element i.
-func (list *ArrayList) Put(i int, e interface{}) error {
+func (list *arrayList) Put(i int, e interface{}) error {
 	if i < 0 || i >= list.count {
 		return fmt.Errorf("Put: index out of bounds: %d", i)
 	}
@@ -70,7 +74,7 @@ func (list *ArrayList) Put(i int, e interface{}) error {
 }
 
 // Index returns the index of the provided element in the list.
-func (list *ArrayList) Index(e interface{}) (int, bool) {
+func (list *arrayList) Index(e interface{}) (int, bool) {
 	for i := 0; i < list.count; i++ {
 		if list.store[i] == e {
 			return i, true
@@ -79,8 +83,12 @@ func (list *ArrayList) Index(e interface{}) (int, bool) {
 	return 0, false
 }
 
+func (list *arrayList) Append(e any) error {
+	return list.Insert(list.Size(), e)
+}
+
 // Contains returns true if element e is in the list.
-func (list *ArrayList) Contains(e interface{}) bool {
+func (list *arrayList) Contains(e interface{}) bool {
 	for i := 0; i < list.count; i++ {
 		if list.store[i] == e {
 			return true
@@ -90,11 +98,11 @@ func (list *ArrayList) Contains(e interface{}) bool {
 }
 
 // Slice makes a new list duplicating part of this list.
-func (list *ArrayList) Slice(i, j int) (List, error) {
+func (list *arrayList) Slice(i, j int) (List, error) {
 	if i < 0 || i > j || j > list.count {
 		return nil, fmt.Errorf("Slice: illegal indecies: i = %d, j = %d", i, j)
 	}
-	result := new(ArrayList)
+	result := new(arrayList)
 	result.count = j - i
 	result.store = make([]interface{}, result.count)
 	copy(result.store[0:], list.store[i:j])
@@ -104,7 +112,7 @@ func (list *ArrayList) Slice(i, j int) (List, error) {
 // Equal determines whether another List is identical to this one.
 // Two Lists are identical if they are the same size and have the same elements
 // in the same order.
-func (list *ArrayList) Equal(l List) bool {
+func (list *arrayList) Equal(l List) bool {
 	if list.count != l.Size() {
 		return false
 	}
@@ -122,7 +130,7 @@ func (list *ArrayList) Equal(l List) bool {
 }
 
 type arrayListIterator struct {
-	list *ArrayList
+	list *arrayList
 	next int
 }
 
@@ -144,14 +152,14 @@ func (iter *arrayListIterator) Next() (interface{}, bool) {
 }
 
 // NewIterator returns an Iterator.
-func (list *ArrayList) NewIterator() containers.Iterator {
+func (list *arrayList) NewIterator() containers.Iterator {
 	result := new(arrayListIterator)
 	result.list = list
 	return result
 }
 
 // Apply calls function f on every element in the list.
-func (list *ArrayList) Apply(f func(interface{})) {
+func (list *arrayList) Apply(f func(interface{})) {
 	for i := 0; i < list.count; i++ {
 		f(list.store[i])
 	}

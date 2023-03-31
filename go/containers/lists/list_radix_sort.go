@@ -4,7 +4,7 @@ func RadixSort(src []int) []int {
 	const base = 10
 	buckets := [base]List{}
 	for i := 0; i < len(buckets); i++ {
-		buckets[i] = new(LinkedList)
+		buckets[i] = NewLinkedList()
 	}
 
 	finalPass := false

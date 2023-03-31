@@ -5,11 +5,11 @@ import "github.com/kidlj/practice/go/containers"
 // List is the interface for lists in the container hierarchy.
 type List interface {
 	containers.Collection
-	Insert(i int, e interface{}) error
-	Delete(i int) (interface{}, error)
-	Get(i int) (interface{}, error)
-	Put(i int, e interface{}) error
-	Index(e interface{}) (int, bool)
+	Insert(i int, e any) error
+	Delete(i int) (any, error)
+	Get(i int) (any, error)
+	Put(i int, e any) error
+	Index(e any) (int, bool)
 	Slice(i, j int) (List, error)
 	Equal(l List) bool
 }

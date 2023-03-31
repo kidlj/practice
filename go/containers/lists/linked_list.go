@@ -11,25 +11,25 @@ type node struct {
 	succ *node
 }
 
-type LinkedList struct {
+type linkedList struct {
 	head        *node
 	cursorIndex int
 	cursorPtr   *node
 	count       int
 }
 
-type LinkedListIterator struct {
-	list    *LinkedList
+type linkedListIterator struct {
+	list    *linkedList
 	current *node
 }
 
-func NewLinkedList() *LinkedList {
-	l := new(LinkedList)
+func NewLinkedList() *linkedList {
+	l := new(linkedList)
 	l.init()
 	return l
 }
 
-func (l *LinkedList) init() {
+func (l *linkedList) init() {
 	if l.head == nil {
 		dummy := &node{}
 		dummy.succ = dummy
@@ -40,7 +40,7 @@ func (l *LinkedList) init() {
 	}
 }
 
-func (l *LinkedList) setCursor(i int) {
+func (l *linkedList) setCursor(i int) {
 	if l.cursorIndex >= i {
 		l.cursorIndex = -1
 		l.cursorPtr = l.head
@@ -52,20 +52,21 @@ func (l *LinkedList) setCursor(i int) {
 	}
 }
 
-func (l *LinkedList) Size() int {
+func (l *linkedList) Size() int {
 	return l.count
 }
 
-func (l *LinkedList) IsEmpty() bool {
+func (l *linkedList) IsEmpty() bool {
 	return l.count == 0
 }
 
-func (l *LinkedList) Clear() {
+func (l *linkedList) Clear() {
 	l.count = 0
 	l.head = nil
+	l.init()
 }
 
-func (l *LinkedList) Insert(i int, e any) error {
+func (l *linkedList) Insert(i int, e any) error {
 	if i < 0 || i > l.count {
 		return fmt.Errorf("Insert: index out of bounds: %d", i)
 	}
@@ -76,7 +77,7 @@ func (l *LinkedList) Insert(i int, e any) error {
 	return nil
 }
 
-func (l *LinkedList) Get(i int) (any, error) {
+func (l *linkedList) Get(i int) (any, error) {
 	if i < 0 || i >= l.count {
 		return nil, fmt.Errorf("Get: Index out of bounds: %d", i)
 	}
@@ -84,11 +85,11 @@ func (l *LinkedList) Get(i int) (any, error) {
 	return l.cursorPtr.succ.item, nil
 }
 
-func (l *LinkedList) Append(e any) {
-	l.Insert(l.count, e)
+func (l *linkedList) Append(e any) error {
+	return l.Insert(l.count, e)
 }
 
-func (l *LinkedList) Put(i int, e any) error {
+func (l *linkedList) Put(i int, e any) error {
 	if i < 0 || i >= l.count {
 		return fmt.Errorf("Put: index out of bounds: %d", i)
 	}
@@ -98,7 +99,7 @@ func (l *LinkedList) Put(i int, e any) error {
 	return nil
 }
 
-func (l *LinkedList) Delete(i int) (any, error) {
+func (l *linkedList) Delete(i int) (any, error) {
 	if i < 0 || i >= l.count {
 		return nil, fmt.Errorf("Delete: index out of bounds: %d", i)
 	}
@@ -110,7 +111,7 @@ func (l *LinkedList) Delete(i int) (any, error) {
 	return result, nil
 }
 
-func (l *LinkedList) Slice(i, j int) (List, error) {
+func (l *linkedList) Slice(i, j int) (List, error) {
 	if i < 0 || i > j || j > l.count {
 		return nil, fmt.Errorf("Slice: index out of bounds: %d,%d", i, j)
 	}
@@ -125,7 +126,7 @@ func (l *LinkedList) Slice(i, j int) (List, error) {
 	return result, nil
 }
 
-func (l *LinkedList) Contains(e any) bool {
+func (l *linkedList) Contains(e any) bool {
 	for n := l.head.succ; n != l.head; n = n.succ {
 		if n.item == e {
 			return true
@@ -135,7 +136,7 @@ func (l *LinkedList) Contains(e any) bool {
 	return false
 }
 
-func (l *LinkedList) Index(e any) (int, bool) {
+func (l *linkedList) Index(e any) (int, bool) {
 	for n, i := l.head.succ, 0; n != l.head; n, i = n.succ, i+1 {
 		if n.item == e {
 			return i, true
@@ -145,7 +146,7 @@ func (l *LinkedList) Index(e any) (int, bool) {
 	return -1, false
 }
 
-func (l *LinkedList) Equal(list List) bool {
+func (l *linkedList) Equal(list List) bool {
 	if l.count != list.Size() {
 		return false
 	}
@@ -162,17 +163,17 @@ func (l *LinkedList) Equal(list List) bool {
 	return true
 }
 
-func (l *LinkedList) Apply(f func(e any)) {
+func (l *linkedList) Apply(f func(e any)) {
 	for n := l.head.succ; n != l.head; n = n.succ {
 		f(n.item)
 	}
 }
 
-func (l *LinkedList) NewIterator() containers.Iterator {
-	return &LinkedListIterator{list: l, current: l.head.succ}
+func (l *linkedList) NewIterator() containers.Iterator {
+	return &linkedListIterator{list: l, current: l.head.succ}
 }
 
-func (iter *LinkedListIterator) Next() (any, bool) {
+func (iter *linkedListIterator) Next() (any, bool) {
 	if iter.current == iter.list.head {
 		return nil, false
 	}
@@ -182,25 +183,20 @@ func (iter *LinkedListIterator) Next() (any, bool) {
 	return result, true
 }
 
-func (iter *LinkedListIterator) Reset() {
+func (iter *linkedListIterator) Reset() {
 	iter.current = iter.list.head.succ
 }
 
-func (iter *LinkedListIterator) Done() bool {
+func (iter *linkedListIterator) Done() bool {
 	return iter.current == iter.list.head
 }
 
-func (l *LinkedList) printLots(seqList List) {
-	iter := seqList.NewIterator()
-	v, ok := iter.Next()
-	n := l.head.succ
-	seq := 1
-	for n != l.head && ok {
-		if seq == v {
-			fmt.Printf("%v ", n.item)
-			v, ok = iter.Next()
-		}
-		seq++
-		n = n.succ
+// Algorithms
+func (l *linkedList) print() string {
+	var s string
+	for n := l.head.succ; n != nil; n = n.succ {
+		s = s + fmt.Sprintf(" %v", n.item)
 	}
+
+	return s
 }

@@ -6,8 +6,8 @@ import (
 )
 
 type PolynomialNode struct {
-	coefficient int
-	exponent    int
+	Coefficient int
+	Exponent    int
 	succ        *PolynomialNode
 }
 
@@ -38,19 +38,19 @@ func (l *Polynomial) add(poly *Polynomial) {
 
 func (l *Polynomial) Insert(n *PolynomialNode) {
 	l.init()
-	p := l.findPrevious(n.exponent)
-	if p.succ != nil && p.succ.exponent == n.exponent {
-		p.succ.coefficient += n.coefficient
+	p := l.findPrevious(n.Exponent)
+	if p.succ != nil && p.succ.Exponent == n.Exponent {
+		p.succ.Coefficient += n.Coefficient
 	} else {
 		// allocate new node to be inserted
-		n = &PolynomialNode{exponent: n.exponent, coefficient: n.coefficient, succ: p.succ}
+		n = &PolynomialNode{Exponent: n.Exponent, Coefficient: n.Coefficient, succ: p.succ}
 		p.succ = n
 	}
 }
 
 func (l *Polynomial) findPrevious(exponent int) *PolynomialNode {
 	p := l.header
-	for p.succ != nil && p.succ.exponent > exponent {
+	for p.succ != nil && p.succ.Exponent > exponent {
 		p = p.succ
 	}
 	return p
@@ -70,18 +70,18 @@ func (l *Polynomial) Multiply(poly *Polynomial) *Polynomial {
 
 func (l *Polynomial) multiply(n1, n2 *PolynomialNode) {
 	n := &PolynomialNode{
-		coefficient: n1.coefficient * n2.coefficient,
-		exponent:    n1.exponent + n2.exponent,
+		Coefficient: n1.Coefficient * n2.Coefficient,
+		Exponent:    n1.Exponent + n2.Exponent,
 	}
 	l.Insert(n)
 }
 
-func (l *Polynomial) Print() {
+func (l *Polynomial) String() string {
 	l.init()
 	items := []string{}
 	for p := l.header.succ; p != nil; p = p.succ {
-		items = append(items, fmt.Sprintf("%d * x^%d", p.coefficient, p.exponent))
+		items = append(items, fmt.Sprintf("%d * x^%d", p.Coefficient, p.Exponent))
 	}
 	result := strings.Join(items, " + ")
-	fmt.Println(result)
+	return result
 }

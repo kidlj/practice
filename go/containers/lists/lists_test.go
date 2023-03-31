@@ -1,33 +1,15 @@
 package lists
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/kidlj/practice/go/containers"
 )
 
-func ExampleArrayList_Insert() {
-	var list ArrayList
-	_ = list.Insert(0, "a")
-	fmt.Println(list.Size())
-	// Output:
-	// 1
-}
-
-func ExampleArrayList_Delete() {
-	var list ArrayList
-	_ = list.Insert(0, "a")
-	_, _ = list.Delete(0)
-	fmt.Println(list.Size())
-	// Output:
-	// 0
-}
-
 func TestLists(t *testing.T) {
-	testList(t, new(ArrayList), "ArrayList ")
+	testList(t, NewArrayList(), "ArrayList ")
 	testList(t, NewLinkedList(), "LinkedList ")
-	testList(t, new(DoublyLinkedList), "DoublyLinkedList ")
+	testList(t, NewDoubleyLinkedList(), "DoublyLinkedList ")
 }
 
 func testList(t *testing.T, list List, name string) {
@@ -263,7 +245,7 @@ func testList(t *testing.T, list List, name string) {
 	}
 
 	// test lists for equality
-	other := new(ArrayList)
+	other := NewArrayList()
 	other.Insert(0, 0)
 	if list.Equal(other) {
 		t.Error(name + "should not be equal to a shorter list")
@@ -282,24 +264,4 @@ func testList(t *testing.T, list List, name string) {
 	if !list.IsEmpty() || 0 != list.Size() {
 		t.Error(name + "should be empty and size should be 0 after clear is called")
 	}
-}
-
-func ExampleLinkedList_printLots() {
-	// 0 1 2 3 4
-	list := new(LinkedList)
-	_ = list.Insert(0, 3)
-	_ = list.Insert(0, 1)
-	_ = list.Insert(2, 4)
-	_ = list.Insert(1, 2)
-	_ = list.Insert(0, 0)
-
-	// 2 3 5
-	seqList := new(LinkedList)
-	_ = seqList.Insert(0, 5)
-	_ = seqList.Insert(0, 3)
-	_ = seqList.Insert(0, 2)
-
-	list.printLots(seqList)
-	// Output:
-	// 1 2 4
 }

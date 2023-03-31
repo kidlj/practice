@@ -12,21 +12,27 @@ type doublyLinkedListNode struct {
 	succ *doublyLinkedListNode
 }
 
-// DoublyLinkedListIterator is the data structure for a LinkedList external iterator.
-type DoublyLinkedListIterator struct {
-	list    *DoublyLinkedList
+// doublyLinkedListIterator is the data structure for a LinkedList external iterator.
+type doublyLinkedListIterator struct {
+	list    *doublyLinkedList
 	current *doublyLinkedListNode
 }
 
-// DoublyLinkedList is a doubly-linked implementation of a list
-type DoublyLinkedList struct {
+// doublyLinkedList is a doubly-linked implementation of a list
+type doublyLinkedList struct {
 	cursorIndex int
 	cursorPtr   *doublyLinkedListNode
 	head        *doublyLinkedListNode
 	count       int
 }
 
-func (list *DoublyLinkedList) init() {
+func NewDoubleyLinkedList() List {
+	l := new(doublyLinkedList)
+	l.init()
+	return l
+}
+
+func (list *doublyLinkedList) init() {
 	if list.head == nil {
 		dummy := &doublyLinkedListNode{item: 0}
 		dummy.pred, dummy.succ = dummy, dummy
@@ -35,7 +41,7 @@ func (list *DoublyLinkedList) init() {
 	}
 }
 
-func (list *DoublyLinkedList) setCursor(index int) {
+func (list *doublyLinkedList) setCursor(index int) {
 	if index <= list.count/2 {
 		// compare the distance of target index between head and between current cursorIndex
 		if index+1 < list.cursorIndex-index {
@@ -60,25 +66,24 @@ func (list *DoublyLinkedList) setCursor(index int) {
 }
 
 // Size indicates how many elements are in the list.
-func (list *DoublyLinkedList) Size() int {
+func (list *doublyLinkedList) Size() int {
 	return list.count
 }
 
 // IsEmpty determines if the list is empty.
-func (list *DoublyLinkedList) IsEmpty() bool {
+func (list *doublyLinkedList) IsEmpty() bool {
 	return list.count == 0
 }
 
 // Clear remove all elements from the list.
-func (list *DoublyLinkedList) Clear() {
+func (list *doublyLinkedList) Clear() {
 	list.count = 0
 	list.head = nil
 	list.init()
 }
 
 // Contains determines wheter e is in the list.
-func (list *DoublyLinkedList) Contains(e interface{}) bool {
-	list.init()
+func (list *doublyLinkedList) Contains(e interface{}) bool {
 	for ptr := list.head.succ; ptr != list.head; ptr = ptr.succ {
 		if ptr.item == e {
 			return true
@@ -88,11 +93,10 @@ func (list *DoublyLinkedList) Contains(e interface{}) bool {
 }
 
 // Insert puts element e into the list at location i.
-func (list *DoublyLinkedList) Insert(i int, e interface{}) error {
+func (list *doublyLinkedList) Insert(i int, e interface{}) error {
 	if i < 0 || i > list.count {
 		return fmt.Errorf("Insert: index out of bounds: %d", i)
 	}
-	list.init()
 	list.setCursor(i)
 	node := &doublyLinkedListNode{e, list.cursorPtr.pred, list.cursorPtr}
 	list.cursorPtr.pred.succ = node
@@ -103,11 +107,10 @@ func (list *DoublyLinkedList) Insert(i int, e interface{}) error {
 }
 
 // Delete removes and returns the element at location i.
-func (list *DoublyLinkedList) Delete(i int) (interface{}, error) {
+func (list *doublyLinkedList) Delete(i int) (interface{}, error) {
 	if i < 0 || i >= list.count {
 		return nil, fmt.Errorf("Delete: index out of bounds: %d", i)
 	}
-	// list.init()
 	list.setCursor(i)
 	result := list.cursorPtr.item
 	list.cursorPtr.pred.succ = list.cursorPtr.succ
@@ -118,7 +121,7 @@ func (list *DoublyLinkedList) Delete(i int) (interface{}, error) {
 }
 
 // Get returns the element at location i.
-func (list *DoublyLinkedList) Get(i int) (interface{}, error) {
+func (list *doublyLinkedList) Get(i int) (interface{}, error) {
 	if i < 0 || i >= list.count {
 		return nil, fmt.Errorf("Get: index out of bounds: %d", i)
 	}
@@ -127,11 +130,10 @@ func (list *DoublyLinkedList) Get(i int) (interface{}, error) {
 }
 
 // Put changes element i.
-func (list *DoublyLinkedList) Put(i int, e interface{}) error {
+func (list *doublyLinkedList) Put(i int, e interface{}) error {
 	if i < 0 || i >= list.count {
 		return fmt.Errorf("Get: index out of bounds: %d", i)
 	}
-	list.init()
 	list.setCursor(i)
 	list.cursorPtr.item = e
 	return nil
@@ -139,8 +141,7 @@ func (list *DoublyLinkedList) Put(i int, e interface{}) error {
 
 // Index returns the location of e.
 // If e is not present, return -1 and false, otherwise return the location and true.
-func (list *DoublyLinkedList) Index(e interface{}) (int, bool) {
-	list.init()
+func (list *doublyLinkedList) Index(e interface{}) (int, bool) {
 	for ptr, i := list.head.succ, 0; ptr != list.head; ptr, i = ptr.succ, i+1 {
 		if ptr.item == e {
 			return i, true
@@ -150,12 +151,11 @@ func (list *DoublyLinkedList) Index(e interface{}) (int, bool) {
 }
 
 // Slice makes a new list duplicating part of the list.
-func (list *DoublyLinkedList) Slice(i, j int) (List, error) {
+func (list *doublyLinkedList) Slice(i, j int) (List, error) {
 	if i < 0 || i > j || j > list.count {
 		return nil, fmt.Errorf("Slice: illegal indecies: %d, %d", i, j)
 	}
-	result := new(DoublyLinkedList)
-	result.init()
+	result := NewDoubleyLinkedList()
 	for srcIndex, dstIndex := i, 0; srcIndex < j; srcIndex, dstIndex = srcIndex+1, dstIndex+1 {
 		v, _ := list.Get(srcIndex)
 		result.Insert(dstIndex, v)
@@ -168,7 +168,7 @@ func (list *DoublyLinkedList) Slice(i, j int) (List, error) {
 // elements in the same order.
 // Precondition: element can be compared using ==.
 // Precondition violation: panic.
-func (list *DoublyLinkedList) Equal(l List) bool {
+func (list *doublyLinkedList) Equal(l List) bool {
 	if list.count != l.Size() {
 		return false
 	}
@@ -184,31 +184,29 @@ func (list *DoublyLinkedList) Equal(l List) bool {
 }
 
 // NewIterator returns an external iterator.
-func (list *DoublyLinkedList) NewIterator() containers.Iterator {
-	list.init()
-	return &DoublyLinkedListIterator{list, list.head.succ}
+func (list *doublyLinkedList) NewIterator() containers.Iterator {
+	return &doublyLinkedListIterator{list, list.head.succ}
 }
 
 // Apply calls function f on every element in the list.
-func (list *DoublyLinkedList) Apply(f func(e interface{})) {
-	list.init()
+func (list *doublyLinkedList) Apply(f func(e interface{})) {
 	for ptr := list.head.succ; ptr != list.head; ptr = ptr.succ {
 		f(ptr.item)
 	}
 }
 
 // Done indicates whether the iteration is complete.
-func (iter *DoublyLinkedListIterator) Done() bool {
+func (iter *doublyLinkedListIterator) Done() bool {
 	return iter.current == iter.list.head
 }
 
 // Reset prepares an iterator o traverse its associated Collection.
-func (iter *DoublyLinkedListIterator) Reset() {
+func (iter *doublyLinkedListIterator) Reset() {
 	iter.current = iter.list.head.succ
 }
 
 // Next returns an element and an indication of whether iteration is in process.
-func (iter *DoublyLinkedListIterator) Next() (interface{}, bool) {
+func (iter *doublyLinkedListIterator) Next() (interface{}, bool) {
 	if iter.current == iter.list.head {
 		return nil, false
 	}
