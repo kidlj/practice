@@ -2,7 +2,7 @@ package lists
 
 import "fmt"
 
-func ExampleLinkedList_oddEvenList() {
+func ExamplelinkedList_oddEvenList() {
 	// 0 1 2 3 4
 	list := NewLinkedList()
 	_ = list.Insert(0, 3)

@@ -1,6 +1,6 @@
 package lists
 
-func ExampleLinkedList_printLots() {
+func ExamplelinkedList_printLots() {
 	// 0 1 2 3 4
 	list := NewLinkedList()
 	_ = list.Insert(0, 3)
