@@ -3,14 +3,14 @@ package lists
 import "fmt"
 
 func ExamplePolynomial_Add() {
-	p1 := new(Polynomial)
+	p1 := NewPolynomial()
 	p1.Insert(&PolynomialNode{Exponent: 100, Coefficient: 100})
 	p1.Insert(&PolynomialNode{Exponent: 1, Coefficient: 3})
 	p1.Insert(&PolynomialNode{Exponent: 10, Coefficient: 2})
 	p1.Insert(&PolynomialNode{Exponent: 10, Coefficient: 3})
 	fmt.Println(p1.String())
 
-	p2 := new(Polynomial)
+	p2 := NewPolynomial()
 	p2.Insert(&PolynomialNode{Exponent: 100, Coefficient: 100})
 	p2.Insert(&PolynomialNode{Exponent: 10, Coefficient: 3})
 	p2.Insert(&PolynomialNode{Exponent: 50, Coefficient: 50})
@@ -28,12 +28,12 @@ func ExamplePolynomial_Add() {
 }
 
 func ExamplePolynomial_Multiply() {
-	p1 := new(Polynomial)
+	p1 := NewPolynomial()
 	p1.Insert(&PolynomialNode{Exponent: 100, Coefficient: 100})
 	p1.Insert(&PolynomialNode{Exponent: 10, Coefficient: 2})
 	fmt.Println(p1.String())
 
-	p2 := new(Polynomial)
+	p2 := NewPolynomial()
 	p2.Insert(&PolynomialNode{Exponent: 100, Coefficient: 100})
 	p2.Insert(&PolynomialNode{Exponent: 10, Coefficient: 5})
 	fmt.Println(p2.String())
