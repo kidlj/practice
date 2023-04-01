@@ -32,7 +32,6 @@ func NewLinkedList() *linkedList {
 func (l *linkedList) init() {
 	if l.head == nil {
 		dummy := &node{}
-		dummy.succ = dummy
 		l.head = dummy
 		l.cursorPtr = dummy
 		l.cursorIndex = -1
@@ -40,6 +39,7 @@ func (l *linkedList) init() {
 	}
 }
 
+// set the cursor to the previous position before the index
 func (l *linkedList) setCursor(i int) {
 	if l.cursorIndex >= i {
 		l.cursorIndex = -1
@@ -85,10 +85,6 @@ func (l *linkedList) Get(i int) (any, error) {
 	return l.cursorPtr.succ.item, nil
 }
 
-func (l *linkedList) Append(e any) error {
-	return l.Insert(l.count, e)
-}
-
 func (l *linkedList) Put(i int, e any) error {
 	if i < 0 || i >= l.count {
 		return fmt.Errorf("Put: index out of bounds: %d", i)
@@ -120,14 +116,14 @@ func (l *linkedList) Slice(i, j int) (List, error) {
 
 	for ; i < j; i++ {
 		e, _ := l.Get(i)
-		result.Append(e)
+		_ = result.Insert(result.Size(), e)
 	}
 
 	return result, nil
 }
 
 func (l *linkedList) Contains(e any) bool {
-	for n := l.head.succ; n != l.head; n = n.succ {
+	for n := l.head.succ; n != nil; n = n.succ {
 		if n.item == e {
 			return true
 		}
@@ -137,7 +133,7 @@ func (l *linkedList) Contains(e any) bool {
 }
 
 func (l *linkedList) Index(e any) (int, bool) {
-	for n, i := l.head.succ, 0; n != l.head; n, i = n.succ, i+1 {
+	for n, i := l.head.succ, 0; n != nil; n, i = n.succ, i+1 {
 		if n.item == e {
 			return i, true
 		}
@@ -153,7 +149,7 @@ func (l *linkedList) Equal(list List) bool {
 
 	iter := list.NewIterator()
 	v, ok := iter.Next()
-	for n := l.head.succ; n != l.head; n = n.succ {
+	for n := l.head.succ; n != nil; n = n.succ {
 		if !ok || n.item != v {
 			return false
 		}
@@ -164,7 +160,7 @@ func (l *linkedList) Equal(list List) bool {
 }
 
 func (l *linkedList) Apply(f func(e any)) {
-	for n := l.head.succ; n != l.head; n = n.succ {
+	for n := l.head.succ; n != nil; n = n.succ {
 		f(n.item)
 	}
 }
@@ -174,7 +170,7 @@ func (l *linkedList) NewIterator() containers.Iterator {
 }
 
 func (iter *linkedListIterator) Next() (any, bool) {
-	if iter.current == iter.list.head {
+	if iter.current == nil {
 		return nil, false
 	}
 
@@ -188,11 +184,11 @@ func (iter *linkedListIterator) Reset() {
 }
 
 func (iter *linkedListIterator) Done() bool {
-	return iter.current == iter.list.head
+	return iter.current == nil
 }
 
 // Algorithms
-func (l *linkedList) print() string {
+func (l *linkedList) String() string {
 	var s string
 	for n := l.head.succ; n != nil; n = n.succ {
 		s = s + fmt.Sprintf(" %v", n.item)

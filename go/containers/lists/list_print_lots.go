@@ -7,7 +7,7 @@ func (l *linkedList) printLots(seqList List) {
 	v, ok := iter.Next()
 	n := l.head.succ
 	seq := 1
-	for n != l.head && ok {
+	for n != nil && ok {
 		if seq == v {
 			fmt.Printf("%v ", n.item)
 			v, ok = iter.Next()

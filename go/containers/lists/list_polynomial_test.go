@@ -2,7 +2,7 @@ package lists
 
 import "fmt"
 
-func ExamplePolynomial_Add() {
+func Example_polynomial_Add() {
 	p1 := NewPolynomial()
 	p1.Insert(&PolynomialNode{Exponent: 100, Coefficient: 100})
 	p1.Insert(&PolynomialNode{Exponent: 1, Coefficient: 3})
@@ -27,7 +27,7 @@ func ExamplePolynomial_Add() {
 	// 200 * x^100 + 50 * x^50 + 8 * x^10 + 5 * x^5 + 7 * x^1
 }
 
-func ExamplePolynomial_Multiply() {
+func Example_polynomial_Multiply() {
 	p1 := NewPolynomial()
 	p1.Insert(&PolynomialNode{Exponent: 100, Coefficient: 100})
 	p1.Insert(&PolynomialNode{Exponent: 10, Coefficient: 2})
