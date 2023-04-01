@@ -1,5 +1,7 @@
 package lists
 
+import "fmt"
+
 func Example_linkedList_printLots() {
 	// 0 1 2 3 4
 	list := NewLinkedList()
@@ -10,12 +12,14 @@ func Example_linkedList_printLots() {
 	_ = list.Insert(0, 0)
 
 	// 2 3 5
-	seqList := NewLinkedList()
-	_ = seqList.Insert(0, 5)
-	_ = seqList.Insert(0, 3)
-	_ = seqList.Insert(0, 2)
+	seq := NewLinkedList()
+	_ = seq.Insert(0, 5)
+	_ = seq.Insert(0, 3)
+	_ = seq.Insert(0, 2)
 
-	list.printLots(seqList)
+	fmt.Println(list.printLots(seq))
+	fmt.Println(list.printLotsRaw(seq))
 	// Output:
-	// 1 2 4
+	// [1 2 4]
+	// [1 2 4]
 }

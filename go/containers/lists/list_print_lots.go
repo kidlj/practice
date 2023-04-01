@@ -1,18 +1,35 @@
 package lists
 
-import "fmt"
-
-func (l *linkedList) printLots(seqList List) {
-	iter := seqList.NewIterator()
+func (l *linkedList) printLots(seq List) []any {
+	result := make([]any, 0, seq.Size())
+	iter := seq.NewIterator()
 	v, ok := iter.Next()
 	n := l.head.succ
-	seq := 1
+	i := 1
 	for n != nil && ok {
-		if seq == v {
-			fmt.Printf("%v ", n.item)
+		if i == v {
+			result = append(result, n.item)
 			v, ok = iter.Next()
 		}
-		seq++
+		i++
 		n = n.succ
 	}
+	return result
+}
+
+func (l *linkedList) printLotsRaw(seq *linkedList) []any {
+	result := make([]any, 0, seq.Size())
+	n := l.head.succ
+	c := seq.head.succ
+
+	i := 1
+	for n != nil && c != nil {
+		if i == c.item {
+			result = append(result, n.item)
+			c = c.succ
+		}
+		i++
+		n = n.succ
+	}
+	return result
 }
