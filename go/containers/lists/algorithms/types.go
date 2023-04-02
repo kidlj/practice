@@ -6,17 +6,13 @@ type listNode struct {
 }
 
 func fromSlice(s []int) *listNode {
-	if len(s) == 0 {
-		return nil
-	}
-
-	result := &listNode{val: s[0]}
-	n := result
-	for _, v := range s[1:] {
+	dummy := &listNode{}
+	n := dummy
+	for _, v := range s {
 		n.next = &listNode{val: v}
 		n = n.next
 	}
-	return result
+	return dummy.next
 }
 
 func (l *listNode) toSlice() []int {
