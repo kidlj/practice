@@ -1,10 +1,12 @@
-package lists
+package algorithms
+
+import "github.com/kidlj/practice/go/containers/lists"
 
 func RadixSort(src []int) []int {
 	const base = 10
-	buckets := [base]List{}
+	buckets := [base]lists.List{}
 	for i := 0; i < len(buckets); i++ {
-		buckets[i] = NewLinkedList()
+		buckets[i] = lists.NewLinkedList()
 	}
 
 	finalPass := false
