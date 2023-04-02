@@ -15,10 +15,9 @@ func fromSlice(s []int) *listNode {
 	return dummy.next
 }
 
-func (l *listNode) toSlice() []int {
-	result := []int{} // initialized value; for easy testing
+func (l *listNode) toSlice() (result []int) {
 	for n := l; n != nil; n = n.next {
 		result = append(result, n.val)
 	}
-	return result
+	return
 }

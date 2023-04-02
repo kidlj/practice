@@ -9,7 +9,7 @@ func Test_helpers(t *testing.T) {
 	testCases := [][]int{
 		{0, 1, 2, 3, 4},
 		{1},
-		{},
+		nil,
 	}
 	for _, tc := range testCases {
 		l := fromSlice(tc)

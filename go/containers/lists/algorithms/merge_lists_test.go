@@ -34,7 +34,7 @@ func Test_mergeLists(t *testing.T) {
 		{
 			a: nil,
 			b: nil,
-			c: []int{},
+			c: nil,
 		},
 	}
 
