@@ -1,11 +1,11 @@
 package algorithms
 
-func oddEvenList(l *listNode) *listNode {
-	if l == nil || l.next == nil {
-		return l
+func oddEvenList(head *listNode) *listNode {
+	if head == nil || head.next == nil {
+		return head
 	}
-	o := l
-	p := l.next
+	o := head
+	p := head.next
 	e := p
 	for o.next != nil && e.next != nil {
 		o.next = e.next
@@ -15,5 +15,5 @@ func oddEvenList(l *listNode) *listNode {
 	}
 	o.next = p
 
-	return l
+	return head
 }
