@@ -118,6 +118,7 @@ func (g *unweightedGraph) AddEdge(edge *Edge) error {
 	return g.representation.addEdge(edge, false)
 }
 
+// Pre-order or post-order traversal
 func (g *unweightedGraph) DFS(from vertex, visit func(g Graph, e *Edge)) {
 	visited := make([]bool, g.Vertices())
 	var dfs func(g Graph, e *Edge)
