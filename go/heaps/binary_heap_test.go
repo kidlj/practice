@@ -79,21 +79,46 @@ func TestBinaryHeap_IncreaseKey(t *testing.T) {
 }
 
 func TestBinaryHeap_Delete(t *testing.T) {
-	h := buildBinaryHeap()
-	v, err := h.Delete(2)
-	if err != nil {
-		t.Errorf("Delete key 2 got error: %v", err)
+	testCases := []struct {
+		s            []int
+		deleteAt     int
+		deletedValue int
+		size         int
+		expected     string
+	}{
+		{
+			s:            []int{5, 7, 6, 3, 8, 2, 4}, // down case
+			deleteAt:     2,
+			deletedValue: 3,
+			size:         6,
+			expected:     "[2 5 4 7 8 6]",
+		},
+		{
+			s:            []int{3, 17, 7, 18, 19, 8, 9}, // up case
+			deleteAt:     5,
+			deletedValue: 19,
+			size:         6,
+			expected:     "[3 9 7 18 17 8]",
+		},
 	}
-	if v != 3 {
-		t.Errorf("Delete key 2 expected value %v, got %v", 3, v)
-	}
-	if h.Size() != 6 {
-		t.Errorf("Delete key 2 expected heap size %v, got %v", 6, h.Size())
-	}
-	expected := "[2 5 4 7 8 6]"
-	s := h.Print()
-	if s != expected {
-		t.Errorf("Delete key 2 failed, expected %s, got %s", expected, s)
+
+	for _, tc := range testCases {
+		h := BuildBinaryHeap(tc.s)
+		v, err := h.Delete(tc.deleteAt)
+		if err != nil {
+			t.Errorf("Delete key got error: %v", err)
+		}
+		if v != tc.deletedValue {
+			t.Errorf("Delete key expected value %v, got %v", tc.deletedValue, v)
+		}
+		if h.Size() != tc.size {
+			t.Errorf("Delete key expected heap size %v, got %v", tc.size, h.Size())
+		}
+		s := h.Print()
+		if s != tc.expected {
+			t.Errorf("Delete key failed, expected %s, got %s", tc.expected, s)
+		}
+
 	}
 }
 

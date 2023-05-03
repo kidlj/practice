@@ -45,7 +45,8 @@ func (h *BinaryHeap) DeleteMin() (int, error) {
 	return min, nil
 }
 
-func (h *BinaryHeap) percolateDown(i int) {
+func (h *BinaryHeap) percolateDown(i0 int) bool {
+	i := i0
 	v := h.elements[i]
 	for child := i * 2; i*2 <= h.size; i, child = child, i*2 {
 		if child != h.size && h.elements[child+1] < h.elements[child] {
@@ -59,6 +60,7 @@ func (h *BinaryHeap) percolateDown(i int) {
 	}
 
 	h.elements[i] = v
+	return i > i0
 }
 
 func (h *BinaryHeap) Insert(v int) {
@@ -94,11 +96,10 @@ func (h *BinaryHeap) Delete(key int) (int, error) {
 	}
 
 	v := h.elements[key]
-	h.elements[key] = math.MinInt
-	h.percolateUp(key)
-	_, err := h.DeleteMin()
-	if err != nil {
-		return -1, err
+	h.elements[key] = h.elements[h.size]
+	h.size--
+	if !h.percolateDown(key) {
+		h.percolateUp(key)
 	}
 	return v, nil
 }
