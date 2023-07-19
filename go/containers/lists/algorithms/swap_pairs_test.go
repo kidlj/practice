@@ -8,6 +8,7 @@ import (
 func Test_swapPairs(t *testing.T) {
 	testSwapPairs(t, "swapPairs", swapPairs)
 	testSwapPairs(t, "swapPairsRecursive", swapPairsRecursive)
+	testSwapPairs(t, "swapPairsPractice", swapPairsPractice)
 }
 
 func testSwapPairs(t *testing.T, name string, f func(*listNode) *listNode) {

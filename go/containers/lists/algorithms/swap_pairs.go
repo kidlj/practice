@@ -1,24 +1,21 @@
 package algorithms
 
 /*
-	  dummy			n			n'
+	  dummy
 		O --> o --> o --> o --> o
-	    l     r  	l'    r'
+	    p     o  	e     n
 */
-func swapPairs(head *listNode) *listNode {
-	dummy := &listNode{next: head}
-	left := dummy
-	right := dummy.next
-
-	for left != nil && right != nil && right.next != nil {
-		// swap
-		left.next = right.next
-		right.next = left.next.next
-		left.next.next = right
-
-		// next move
-		left = right
-		right = left.next
+func swapPairs(l *listNode) *listNode {
+	dummy := &listNode{next: l}
+	p := dummy
+	for p.next != nil && p.next.next != nil {
+		o := p.next
+		e := p.next.next
+		n := p.next.next.next
+		p.next = e
+		e.next = o
+		o.next = n
+		p = o
 	}
 
 	return dummy.next
@@ -26,14 +23,14 @@ func swapPairs(head *listNode) *listNode {
 
 /*
 		 o --> o --> o --> o
-	    head  next
+	     l     n
 */
-func swapPairsRecursive(head *listNode) *listNode {
-	if head == nil || head.next == nil {
-		return head
+func swapPairsRecursive(l *listNode) *listNode {
+	if l == nil || l.next == nil {
+		return l
 	}
-	next := head.next
-	head.next = swapPairsRecursive(next.next)
-	next.next = head
-	return next
+	n := l.next
+	l.next = swapPairsRecursive(n.next)
+	n.next = l
+	return n
 }
