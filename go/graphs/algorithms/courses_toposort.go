@@ -28,9 +28,9 @@ func topoSort(courses map[string][]string) []string {
 	visitAll = func(items []string) {
 		for _, item := range items {
 			if !seen[item] {
-				seen[item] = true
+				seen[item] = true // pre-order: to prevent cycles from causing stack overflow
 				visitAll(courses[item])
-				order = append(order, item)
+				order = append(order, item) // post-order
 			}
 		}
 	}

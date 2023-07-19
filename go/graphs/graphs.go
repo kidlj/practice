@@ -126,8 +126,8 @@ func (g *unweightedGraph) DFS(from vertex, visit func(g Graph, e *Edge)) {
 		if visited[e.to] {
 			return
 		}
-		visited[e.to] = true
-		visit(g, e)
+		visited[e.to] = true // pre-order
+		visit(g, e)          // pre-order
 		iter, _ := g.NewIterator(e.to)
 		for e, ok := iter.Next(); ok; e, ok = iter.Next() {
 			dfs(g, e)
