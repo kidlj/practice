@@ -20,7 +20,7 @@ func Test_oddEvenList(t *testing.T) {
 		},
 		{
 			l:        fromSlice([]int{}),
-			expected: []int{},
+			expected: nil,
 		},
 		{
 			l:        fromSlice([]int{0}),
