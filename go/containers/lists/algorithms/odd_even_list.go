@@ -1,9 +1,10 @@
 package algorithms
 
 func oddEvenList(l *listNode) *listNode {
-	if l == nil || l.next == nil {
+	if l == nil {
 		return l
 	}
+
 	o := l
 	p := l.next
 	e := p
