@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// https://leetcode.cn/problems/add-two-numbers/
 func Test_addTwoNumbers(t *testing.T) {
 	testCases := []struct {
 		l1       *listNode
@@ -13,8 +14,13 @@ func Test_addTwoNumbers(t *testing.T) {
 	}{
 		{
 			l1:       fromSlice([]int{2, 4, 3}),
-			l2:       fromSlice([]int{5, 6, 4}),
-			expected: []int{7, 0, 8},
+			l2:       fromSlice([]int{5, 6, 1}),
+			expected: []int{7, 0, 5},
+		},
+		{
+			l1:       fromSlice([]int{2, 4, 8}),
+			l2:       fromSlice([]int{5, 6, 1}),
+			expected: []int{7, 0, 0, 1},
 		},
 		{
 			l1:       fromSlice([]int{0}),

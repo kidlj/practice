@@ -1,29 +1,30 @@
 package algorithms
 
-func deleteDuplicates(head *listNode) *listNode {
-	if head == nil || head.next == nil {
-		return head
+func deleteDuplicates(l *listNode) *listNode {
+	if l == nil {
+		return l
 	}
 
-	n := head
+	n := l
 	for n.next != nil {
 		if n.val == n.next.val {
 			n.next = n.next.next
+		} else {
+			n = n.next
 		}
-		n = n.next
 	}
 
-	return head
+	return l
 }
 
-func deleteDuplicatesRecursive(head *listNode) *listNode {
-	if head == nil || head.next == nil {
-		return head
+func deleteDuplicatesRecursive(l *listNode) *listNode {
+	if l == nil || l.next == nil {
+		return l
 	}
 
-	head.next = deleteDuplicatesRecursive(head.next)
-	if head.val == head.next.val {
-		head = head.next
+	l.next = deleteDuplicatesRecursive(l.next)
+	if l.val == l.next.val {
+		l = l.next
 	}
-	return head
+	return l
 }

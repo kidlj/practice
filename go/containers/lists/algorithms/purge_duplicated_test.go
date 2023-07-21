@@ -5,13 +5,14 @@ import (
 	"testing"
 )
 
+// https://leetcode.cn/problems/remove-duplicates-from-sorted-list-ii/
 func Test_purgeDuplicated(t *testing.T) {
 	testCases := []struct {
 		l        *listNode
 		expected []int
 	}{
 		{
-			l:        fromSlice([]int{0, 0, 1, 2, 2, 3, 3}),
+			l:        fromSlice([]int{0, 0, 1, 2, 2, 2, 3, 3, 3}),
 			expected: []int{1},
 		},
 		{

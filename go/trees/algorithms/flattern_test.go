@@ -3,17 +3,16 @@ package algorithms
 import (
 	"reflect"
 	"testing"
-
-	trees "github.com/kidlj/practice/go/trees/algorithms"
 )
 
+// https://leetcode.cn/problems/flatten-binary-tree-to-linked-list/
 func Test_flatten(t *testing.T) {
 	testCases := []struct {
-		t        *trees.TreeNode
+		t        *TreeNode
 		expected []int
 	}{
 		{
-			t:        trees.FromSlice([]int{0, -3, 9, 5, -10}),
+			t:        FromSlice([]int{0, -3, 9, 5, -10}),
 			expected: []int{0, -3, -10, 9, 5},
 		},
 		{
@@ -21,7 +20,7 @@ func Test_flatten(t *testing.T) {
 			expected: nil,
 		},
 		{
-			t:        trees.FromSlice([]int{1}),
+			t:        FromSlice([]int{1}),
 			expected: []int{1},
 		},
 	}
