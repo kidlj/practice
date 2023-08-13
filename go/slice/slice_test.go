@@ -81,13 +81,24 @@ func ExampleArrayIndex() {
 
 func ExampleMakeSlice() {
 	a := make([]int, 4)
-	b := make([]int, 0, 4)
-	a = append(a, 1)
-	b = append(b, 1)
+	c := a
+	a = append(a, 1) // len > cap, allocate new array;
+	c[0] = 1
+
+	b := make([]int, 1, 4)
+	d := b
+	b = append(b, 1) // len <= cap, no allocation of new array.
+	d[0] = 1
+
 	fmt.Println(a)
+	fmt.Println(c)
+
 	fmt.Println(b)
+	fmt.Println(d)
 	// Output:
 	// [0 0 0 0 1]
+	// [1 0 0 0]
+	// [1 1]
 	// [1]
 }
 
