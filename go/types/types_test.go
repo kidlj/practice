@@ -112,8 +112,20 @@ func EmployeeByID(id int) Employee {
 	}
 }
 
+func (e *Employee) SetSalary(salary int) {
+	e.Salary = salary
+}
+
 // gopl p100.
 func Example_Value_Variable() {
 	// cannot assign to EmployeeByID(3).Salary (value of type int) compiler
 	// EmployeeByID(3).Salary = 0
+}
+
+func Example_AutoPointer() {
+	e := Employee{}
+	e.SetSalary(100)
+	fmt.Println(e.Salary)
+	// Output:
+	// 100
 }
