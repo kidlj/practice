@@ -103,3 +103,13 @@ func Test_recursion(t *testing.T) {
 		t.Error("failed")
 	}
 }
+
+func Example_nil() {
+	b := []byte("[1,2,3]")
+	var s []int
+	var t = &s
+	_ = json.Unmarshal(b, t)
+	fmt.Println(s)
+	// Output:
+	// nil
+}

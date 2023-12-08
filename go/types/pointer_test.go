@@ -36,3 +36,35 @@ func Example_nil() {
 	// 0
 	// false
 }
+
+type S struct{}
+
+type T struct {
+	S S
+}
+
+func (s S) value() {
+	fmt.Println("value")
+}
+
+func (s *S) pointer() {
+	fmt.Println("pointer")
+}
+
+func Example_receiver() {
+	S{}.value()
+	[]S{{}}[0].value()
+	T{S{}}.S.value()
+	map[string]S{"a": {}}["a"].value()
+
+	S{}.pointer()                        // compiler: cannot call pointer method ptr on S
+	[]S{{}}[0].pointer()                 // ok for slice/array literal elements
+	T{S{}}.S.pointer()                   // compiler: cannot call pointer method ptr on S
+	map[string]S{"a": {}}["a"].pointer() // compiler: cannot call pointer method ptr on S
+
+	// Output:
+	// value
+	// value
+	// value
+	// value
+}
