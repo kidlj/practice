@@ -40,3 +40,15 @@ func Example_Map_init() {
 	// Output:
 	// map[a:aa]
 }
+
+func Example_Map_access() {
+	roles := make(map[string][]string)
+	role := roles["test"]
+	fmt.Println(role)
+
+	roles["hello"] = append(roles["hello"], "world")
+	fmt.Println(roles)
+	// Output:
+	// []
+	// map[hello:[world]]
+}

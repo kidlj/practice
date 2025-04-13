@@ -129,3 +129,8 @@ func Example_AutoPointer() {
 	// Output:
 	// 100
 }
+
+func Example_nil_dereference() {
+	var a any
+	fmt.Println(a.(*int))
+}

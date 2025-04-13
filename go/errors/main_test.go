@@ -23,3 +23,23 @@ func Example_As() {
 	// pp is nil: false
 	// Failed at path: non-existing
 }
+
+type ExampleError string
+
+func (e ExampleError) Error() string {
+	return string(e)
+}
+
+func Example_Is() {
+	err := ExampleError("test error")
+	err2 := fmt.Errorf("%w", err)
+	if errors.Is(err, err) {
+		fmt.Println("true")
+	}
+	if errors.Is(err2, err) {
+		fmt.Println("true")
+	}
+	// Output:
+	// true
+	// true
+}
